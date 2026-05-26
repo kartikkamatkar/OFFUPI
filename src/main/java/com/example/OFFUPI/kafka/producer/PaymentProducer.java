@@ -1,17 +1,25 @@
 package com.example.OFFUPI.kafka.producer;
 
 import com.example.OFFUPI.dto.PaymentEvent;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class PaymentProducer {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(PaymentProducer.class);
+
     private final KafkaTemplate<String, PaymentEvent> kafkaTemplate;
+
+    // Constructor Injection
+    public PaymentProducer(
+            KafkaTemplate<String, PaymentEvent> kafkaTemplate
+    ) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     public void publish(PaymentEvent event) {
 
@@ -21,7 +29,9 @@ public class PaymentProducer {
                 event
         );
 
-        log.info("Payment event published to Kafka: {}",
-                event.getPacketHash());
+        log.info(
+                "Payment event published to Kafka: {}",
+                event.getPacketHash()
+        );
     }
 }

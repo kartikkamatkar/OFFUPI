@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Mesh · Offline Payment Gossip | BharatPay</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #ffffff;
+            color: #000000;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            border-left: 4px solid #000000;
+            padding-left: 18px;
+        }
+        .subhead {
+            font-size: 0.85rem;
+            margin-bottom: 28px;
+            margin-top: 6px;
+            color: #3a3a3a;
+            border-left: 4px solid #cccccc;
+            padding-left: 18px;
+        }
+        h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 6px;
+            margin-top: 28px;
+            margin-bottom: 18px;
+        }
+        h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #111111;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .device {
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #fefefe;
+        }
+        .device.bridge {
+            background: #f6f6f6;
+            border-left: 4px solid #000;
+        }
+        .device.offline {
+            opacity: 0.85;
+        }
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 700;
+            margin-left: 8px;
+            letter-spacing: 0.3px;
+            border: 1px solid #000;
+        }
+        .badge-online {
+            background: #000000;
+            color: white;
+        }
+        .badge-offline {
+            background: #eaeaea;
+            color: #1a1a1a;
+            border-color: #aaa;
+        }
+        .packet-id {
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 10px;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 30px;
+            margin: 2px;
+            display: inline-block;
+            border: 0.5px solid #ccc;
+        }
+        button {
+            background: #000000;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            margin: 4px 6px 4px 0;
+            transition: 0.1s linear;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #2c2c2c;
+            transform: translateY(-1px);
+        }
+        button.danger {
+            background: #ffffff;
+            color: #b91c1c;
+            border: 1px solid #b91c1c;
+        }
+        button.danger:hover {
+            background: #fff0f0;
+            color: #9b1111;
+        }
+        button.secondary {
+            background: #eaeaea;
+            color: #000000;
+            border: 1px solid #888;
+        }
+        button.secondary:hover {
+            background: #d0d0d0;
+        }
+        input, select {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #4a4a4a;
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-size: 13px;
+            margin: 4px 6px 4px 0;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            text-align: left;
+            padding: 10px 6px;
+            border-bottom: 1px solid #e2e2e2;
+        }
+        th {
+            color: #3a3a3a;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-SETTLED {
+            color: #0f5c2f;
+            font-weight: 700;
+        }
+        .status-REJECTED {
+            color: #b91c1c;
+            font-weight: 700;
+        }
+        .status-DUPLICATE_DROPPED {
+            color: #b45309;
+            font-weight: 700;
+        }
+        .status-INVALID {
+            color: #b91c1c;
+            font-weight: 700;
+        }
+        #log {
+            background: #fafafc;
+            color: #1a1a1a;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 240px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #d4d4d4;
+        }
+        .controls {
+            background: #f9f9f9;
+            padding: 18px;
+            border-radius: 18px;
+            border: 1px solid #bbbbbb;
+            margin-bottom: 24px;
+        }
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .balance {
+            font-family: monospace;
+            font-weight: 700;
+        }
+        .small {
+            font-size: 11px;
+            color: #3d3d3d;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #d0d0d0;
+            margin: 12px 0;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        @media (max-width: 720px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div>
+        <h1>⚡ UPI Mesh · Offline Payment Gossip</h1>
+        <div class="subhead">Zero Internet · Encrypted packets hop node-to-node · Bridge nodes settle via 4G backend</div>
+    </div>
+
+    <div class="controls">
+        <h3 style="margin-top:0">🔁 Transaction Flow</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <div style="flex:1; min-width: 200px;">
+                <span class="step-num">1</span><strong>Compose payment</strong><br>
+                <select id="senderVpa">
+                    <option>raj@gramin</option>
+                    <option>priya@gramin</option>
+                    <option>arjun@gramin</option>
+                </select>
+                →
+                <select id="receiverVpa">
+                    <option>neha@gramin</option>
+                    <option>priya@gramin</option>
+                    <option>raj@gramin</option>
+                    <option>vikram@gramin</option>
+                </select>
+                <br>
+                ₹<input type="number" id="amount" value="450" style="width: 110px">
+                PIN <input type="text" id="pin" value="1234" style="width: 80px" maxlength="4">
+                <button onclick="sendPacket()">📨 Inject into Mesh</button>
+            </div>
+            <div style="flex:1; min-width: 160px;">
+                <span class="step-num">2</span><strong>Gossip round</strong><br>
+                <button class="secondary" onclick="gossip()">🔄 Propagate Packets</button>
+                <span class="small">(device ↔ device)</span>
+            </div>
+            <div style="flex:1; min-width: 170px;">
+                <span class="step-num">3</span><strong>Bridge → Cloud</strong><br>
+                <button class="secondary" onclick="flushBridges()">🌉 Upload to Backend</button>
+                <span class="small">(idempotent settlement)</span>
+            </div>
+            <div>
+                <button class="danger" onclick="resetMesh()">⟳ Full Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card">
+            <h2>📱 Mesh Devices</h2>
+            <div id="devices"></div>
+        </div>
+
+        <div class="card">
+            <h2>💰 Account Balances</h2>
+            <table id="accounts-table">
+                <thead><tr><th>UPI ID</th><th>Holder</th><th>Balance (₹)</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <div class="small" id="cacheInfo" style="margin-top: 12px;"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📜 Transaction Ledger</h2>
+        <div style="overflow-x: auto;">
+            <table id="tx-table">
+                <thead>
+                <tr>
+                    <th>Tx ID</th><th>From</th><th>To</th><th>Amount</th>
+                    <th>Status</th><th>Bridge Node</th><th>Hops</th><th>Settled At</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📡 Activity Log</h2>
+        <div id="log"></div>
+    </div>
+</div>
+
+<script>
+    // ---------- In-Memory Mesh Simulation ----------
+    const devices = [
+        { id: "mobile-raj", hasInternet: false, name: "Raj's Phone" },
+        { id: "mobile-priya", hasInternet: false, name: "Priya's Phone" },
+        { id: "mobile-arjun", hasInternet: false, name: "Arjun's Phone" },
+        { id: "bridge-bus", hasInternet: true, name: "Bridge · Bus Stop" },
+        { id: "bridge-shop", hasInternet: true, name: "Bridge · Village Shop" }
+    ];
+
+    // Account data
+    let accounts = new Map([
+        ["raj@gramin", { holderName: "Raj Verma", balance: 5200 }],
+        ["priya@gramin", { holderName: "Priya Sharma", balance: 3150 }],
+        ["arjun@gramin", { holderName: "Arjun Singh", balance: 6800 }],
+        ["neha@gramin", { holderName: "Neha Kapoor", balance: 2750 }],
+        ["vikram@gramin", { holderName: "Vikram Yadav", balance: 1950 }]
+    ]);
+
+    // Packets per device: Map<deviceId, Array<Packet>>
+    let devicePacketMap = new Map();
+    devices.forEach(d => devicePacketMap.set(d.id, []));
+
+    // Idempotency cache (processed packet IDs)
+    let idempotencyCache = new Set();
+
+    // Global transaction ledger
+    let transactions = [];
+
+    let packetCounter = 2100;
+
+    function generatePacketId() {
+        return "pkt_" + Date.now() + "_" + (packetCounter++) + "_" + Math.random().toString(36).substring(2, 8);
+    }
+
+    class UpiPacket {
+        constructor(id, senderVpa, receiverVpa, amount, pin, ttl, originDevice, hops = 0, cipherPreview = "aes256-encrypted") {
+            this.id = id;
+            this.senderVpa = senderVpa;
+            this.receiverVpa = receiverVpa;
+            this.amount = amount;
+            this.pin = pin;
+            this.ttl = ttl;
+            this.originDevice = originDevice;
+            this.hopCount = hops;
+            this.cipherPreview = cipherPreview;
+            this.createdAt = Date.now();
+        }
+
+        static create(sender, receiver, amount, pin, ttl, startDevice) {
+            const newId = generatePacketId();
+            const preview = `cipher:${newId.slice(-8)}...${Math.floor(amount)}`;
+            return new UpiPacket(newId, sender, receiver, amount, pin, ttl, startDevice, 0, preview);
+        }
+    }
+
+    // ---------- Core settlement logic (idempotent, PIN = 1234) ----------
+    function settlePacket(packet, bridgeNodeId) {
+        if (idempotencyCache.has(packet.id)) {
+            return { status: "DUPLICATE_DROPPED", reason: "already processed", packetId: packet.id };
+        }
+        // PIN validation (demo: only "1234" works)
+        if (packet.pin !== "1234") {
+            idempotencyCache.add(packet.id);
+            transactions.push({
+                id: packet.id,
+                senderVpa: packet.senderVpa,
+                receiverVpa: packet.receiverVpa,
+                amount: packet.amount,
+                status: "INVALID",
+                bridgeNodeId: bridgeNodeId,
+                hopCount: packet.hopCount,
+                settledAt: new Date().toISOString()
+            });
+            return { status: "INVALID", reason: "incorrect PIN", packetId: packet.id };
+        }
+
+        const senderAcc = accounts.get(packet.senderVpa);
+        const receiverAcc = accounts.get(packet.receiverVpa);
+        if (!senderAcc || !receiverAcc) {
+            idempotencyCache.add(packet.id);
+            transactions.push({
+                id: packet.id,
+                senderVpa: packet.senderVpa,
+                receiverVpa: packet.receiverVpa,
+                amount: packet.amount,
+                status: "REJECTED",
+                bridgeNodeId: bridgeNodeId,
+                hopCount: packet.hopCount,
+                settledAt: new Date().toISOString()
+            });
+            return { status: "REJECTED", reason: "account not found", packetId: packet.id };
+        }
+
+        if (senderAcc.balance < packet.amount) {
+            idempotencyCache.add(packet.id);
+            transactions.push({
+                id: packet.id,
+                senderVpa: packet.senderVpa,
+                receiverVpa: packet.receiverVpa,
+                amount: packet.amount,
+                status: "REJECTED",
+                bridgeNodeId: bridgeNodeId,
+                hopCount: packet.hopCount,
+                settledAt: new Date().toISOString()
+            });
+            return { status: "REJECTED", reason: "insufficient balance", packetId: packet.id };
+        }
+
+        // settlement
+        senderAcc.balance -= packet.amount;
+        receiverAcc.balance += packet.amount;
+        idempotencyCache.add(packet.id);
+        transactions.push({
+            id: packet.id,
+            senderVpa: packet.senderVpa,
+            receiverVpa: packet.receiverVpa,
+            amount: packet.amount,
+            status: "SETTLED",
+            bridgeNodeId: bridgeNodeId,
+            hopCount: packet.hopCount,
+            settledAt: new Date().toISOString()
+        });
+        return { status: "SETTLED", reason: "success", packetId: packet.id };
+    }
+
+    // ---------- Gossip: random device-to-device propagation with TTL decay ----------
+    function runGossipRound() {
+        let transfers = 0;
+        const deviceIds = devices.map(d => d.id);
+        const snapshot = new Map();
+        for (let [devId, pkts] of devicePacketMap.entries()) {
+            snapshot.set(devId, [...pkts]);
+        }
+
+        for (let sourceId of deviceIds) {
+            const sourcePackets = snapshot.get(sourceId) || [];
+            if (sourcePackets.length === 0) continue;
+
+            let candidates = deviceIds.filter(id => id !== sourceId);
+            if (candidates.length === 0) continue;
+            const targetId = candidates[Math.floor(Math.random() * candidates.length)];
+            const targetPacketList = devicePacketMap.get(targetId);
+
+            let added = 0;
+            for (let pkt of sourcePackets) {
+                if (pkt.ttl > 0) {
+                    const cloned = Object.assign(Object.create(Object.getPrototypeOf(pkt)), pkt);
+                    cloned.ttl = pkt.ttl - 1;
+                    cloned.hopCount = pkt.hopCount + 1;
+                    const alreadyExists = targetPacketList.some(ex => ex.id === cloned.id);
+                    if (!alreadyExists) {
+                        targetPacketList.push(cloned);
+                        added++;
+                        transfers++;
+                    }
+                }
+            }
+        }
+        return { transfers, deviceCounts: Array.from(devicePacketMap.entries()).map(([id, arr]) => ({ id, count: arr.length })) };
+    }
+
+    // ---------- All bridge nodes attempt to settle every packet they hold ----------
+    async function flushAllBridges() {
+        const bridgeDevices = devices.filter(d => d.hasInternet === true);
+        const results = [];
+        for (let bridge of bridgeDevices) {
+            const packetsOnBridge = devicePacketMap.get(bridge.id) || [];
+            const packetsCopy = [...packetsOnBridge];
+            for (let pkt of packetsCopy) {
+                const settlement = settlePacket(pkt, bridge.id);
+                const currentList = devicePacketMap.get(bridge.id);
+                const idx = currentList.findIndex(p => p.id === pkt.id);
+                if (idx !== -1) currentList.splice(idx, 1);
+                results.push({
+                    bridgeNode: bridge.name,
+                    packetId: pkt.id.substring(0, 12),
+                    outcome: settlement.status,
+                    reason: settlement.reason || ''
+                });
+            }
+        }
+        return { uploadsAttempted: bridgeDevices.length, results };
+    }
+
+    // ---------- Inject a new UPI packet into a specific start device (mesh entry) ----------
+    function injectPayment(senderVpa, receiverVpa, amount, pin, ttl, startDeviceId) {
+        const exists = devices.some(d => d.id === startDeviceId);
+        if (!exists) throw new Error("Invalid start device");
+        const newPacket = UpiPacket.create(senderVpa, receiverVpa, amount, pin, ttl, startDeviceId);
+        const devicePackets = devicePacketMap.get(startDeviceId);
+        if (devicePackets) {
+            devicePackets.push(newPacket);
+        } else {
+            devicePacketMap.set(startDeviceId, [newPacket]);
+        }
+        return { packetId: newPacket.id, injectedAt: startDeviceId, ttl: newPacket.ttl, cipherPreview: newPacket.cipherPreview };
+    }
+
+    // ---------- Full reset: restore balances, clear packets, cache, ledger ----------
+    function fullReset() {
+        const freshAccounts = new Map([
+            ["raj@gramin", { holderName: "Raj Verma", balance: 5200 }],
+            ["priya@gramin", { holderName: "Priya Sharma", balance: 3150 }],
+            ["arjun@gramin", { holderName: "Arjun Singh", balance: 6800 }],
+            ["neha@gramin", { holderName: "Neha Kapoor", balance: 2750 }],
+            ["vikram@gramin", { holderName: "Vikram Yadav", balance: 1950 }]
+        ]);
+        accounts = freshAccounts;
+        devicePacketMap.clear();
+        devices.forEach(d => devicePacketMap.set(d.id, []));
+        idempotencyCache.clear();
+        transactions = [];
+        packetCounter = Date.now() % 10000 + 100;
+    }
+
+    // ---------- UI & Binding ----------
+    async function refreshUI() {
+        // Devices panel
+        const devicesDiv = document.getElementById('devices');
+        const deviceState = devices.map(d => {
+            const packets = devicePacketMap.get(d.id) || [];
+            const packetIds = packets.map(p => p.id.substring(0, 8));
+            return {
+                displayName: d.name,
+                hasInternet: d.hasInternet,
+                packetCount: packets.length,
+                packetIds
+            };
+        });
+        devicesDiv.innerHTML = deviceState.map(d => `
+        <div class="device ${d.hasInternet ? 'bridge' : 'offline'}">
+            <strong>${d.displayName}</strong>
+            <span class="badge ${d.hasInternet ? 'badge-online' : 'badge-offline'}">
+                ${d.hasInternet ? '📡 4G Bridge' : '📴 Offline'}
+            </span>
+            <span class="small">holding ${d.packetCount} packet(s)</span>
+            <div>${d.packetIds.map(id => `<span class="packet-id">${id}</span>`).join('')}</div>
+        </div>
+        `).join('');
+        document.getElementById('cacheInfo').innerHTML = `🔄 Idempotency cache size: ${idempotencyCache.size} (prevents duplicate settlement)`;
+
+        // Accounts table
+        const accList = Array.from(accounts.entries()).map(([vpa, data]) => ({ vpa, holderName: data.holderName, balance: data.balance }));
+        document.querySelector('#accounts-table tbody').innerHTML = accList.map(a => `
+        <tr><td><strong>${a.vpa}</strong></td><td>${a.holderName}</td><td class="balance">₹ ${a.balance.toFixed(2)}</td></tr>
+        `).join('');
+
+        // Transaction ledger (latest first)
+        const txs = [...transactions].reverse().slice(0, 30);
+        document.querySelector('#tx-table tbody').innerHTML = txs.map(t => {
+            let statusLabel = t.status;
+            if (t.status === 'SETTLED') statusLabel = '✅ SETTLED';
+            else if (t.status === 'REJECTED') statusLabel = '❌ REJECTED';
+            else if (t.status === 'INVALID') statusLabel = '⚠️ INVALID PIN';
+            else if (t.status === 'DUPLICATE_DROPPED') statusLabel = '🔄 DUPLICATE';
+            return `
+            <tr>
+                <td style="font-family:monospace; font-size:11px;">${t.id.substring(0,14)}..</td>
+                <td>${t.senderVpa}</td><td>${t.receiverVpa}</td>
+                <td class="balance">₹ ${t.amount.toFixed(2)}</td>
+                <td class="status-${t.status}">${statusLabel}</td>
+                <td class="small">${t.bridgeNodeId || '—'}</td>
+                <td>${t.hopCount}</td>
+                <td class="small">${new Date(t.settledAt).toLocaleTimeString()}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    function log(msg) {
+        const logDiv = document.getElementById('log');
+        const timestamp = new Date().toLocaleTimeString('en-US');
+        logDiv.textContent = `[${timestamp}] ${msg}\n${logDiv.textContent}`;
+        if (logDiv.textContent.length > 3200) {
+            logDiv.textContent = logDiv.textContent.substring(0, 2800);
+        }
+    }
+
+    // exposed API for buttons
+    window.sendPacket = function() {
+        const sender = document.getElementById('senderVpa').value;
+        const receiver = document.getElementById('receiverVpa').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+        const pin = document.getElementById('pin').value;
+        if (isNaN(amount) || amount <= 0) {
+            log("❌ Invalid amount");
+            return;
+        }
+        const startDevice = 'mobile-raj';
+        const ttl = 5;
+        try {
+            const res = injectPayment(sender, receiver, amount, pin, ttl, startDevice);
+            log(`📦 Packet ${res.packetId.substring(0,10)}... injected at ${res.injectedAt} | TTL ${res.ttl}`);
+            log(`   encrypted preview: ${res.cipherPreview}`);
+            refreshUI();
+        } catch(e) { log("Error: " + e.message); }
+    };
+
+    window.gossip = function() {
+        const result = runGossipRound();
+        log(`🔄 Gossip round complete: ${result.transfers} packet(s) transferred.`);
+        refreshUI();
+    };
+
+    window.flushBridges = async function() {
+        const result = await flushAllBridges();
+        log(`🌉 Bridge upload: ${result.uploadsAttempted} bridge node(s) attempted.`);
+        result.results.forEach(r => {
+            if (r.outcome === 'SETTLED') log(`   ✅ ${r.bridgeNode} : packet ${r.packetId} → SETTLED`);
+            else if (r.outcome === 'REJECTED') log(`   ❌ ${r.bridgeNode} : packet ${r.packetId} → REJECTED (${r.reason})`);
+            else if (r.outcome === 'INVALID') log(`   ⚠️ ${r.bridgeNode} : packet ${r.packetId} → INVALID PIN`);
+            else log(`   🔁 ${r.bridgeNode} : packet ${r.packetId} → DUPLICATE DROPPED`);
+        });
+        refreshUI();
+    };
+
+    window.resetMesh = function() {
+        fullReset();
+        log("♻️ Full mesh reset: all packets cleared, balances restored, ledger wiped.");
+        refreshUI();
+    };
+
+    fullReset();
+    refreshUI();
+    setInterval(refreshUI, 2800);
+</script>
+</body>
+</html>
