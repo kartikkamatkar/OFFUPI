@@ -14,11 +14,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PaymentEventConsumer {
+public class RetryConsumer {
 
     private static final Logger log =
             LoggerFactory.getLogger(
-                    PaymentEventConsumer.class
+                    RetryConsumer.class
             );
 
     @Autowired
@@ -28,17 +28,17 @@ public class PaymentEventConsumer {
     private RetryProducer retryProducer;
 
     @KafkaListener(
-            topics = "payment-ingestion",
-            groupId = "offupi-group"
+            topics = "payment-retry",
+            groupId = "retry-group"
     )
-    public void consume(
+    public void retry(
             PaymentEvent event
     ) {
 
         try {
 
             log.info(
-                    "Processing event: {}",
+                    "Retrying event: {}",
                     event.getPacketHash()
             );
 
@@ -47,11 +47,11 @@ public class PaymentEventConsumer {
         } catch (Exception e) {
 
             log.error(
-                    "Main processing failed: {}",
+                    "Retry failed permanently: {}",
                     e.getMessage()
             );
 
-            retryProducer.sendToRetry(event);
+            retryProducer.sendToDeadLetter(event);
         }
     }
 }

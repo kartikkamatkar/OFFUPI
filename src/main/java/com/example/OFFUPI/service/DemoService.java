@@ -17,9 +17,9 @@ import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.UUID;
 @Service
-public class StaticDataService {
+public class DemoService {
 
-    private static final Logger log = LoggerFactory.getLogger(StaticDataService.class);
+    private static final Logger log = LoggerFactory.getLogger(DemoService.class);
 
     @Autowired
     private AccountRepository accounts;

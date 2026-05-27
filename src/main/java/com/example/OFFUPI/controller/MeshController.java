@@ -1,28 +1,55 @@
 package com.example.OFFUPI.controller;
 
-import com.example.OFFUPI.service.MeshNetworkService;
+import com.example.OFFUPI.service.BridgeIngestionService;
+import com.example.OFFUPI.service.MeshSimulatorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 @RestController
 @RequestMapping("/api/mesh")
 public class MeshController {
 
     @Autowired
-    private MeshNetworkService meshService;
+    private MeshSimulatorService meshSimulatorService;
+
+    @Autowired
+    private BridgeIngestionService bridgeIngestionService;
 
     @GetMapping("/state")
-    public Map<String, List<?>> state() {
+    public Object state() {
 
-        return meshService.getState();
+        return meshSimulatorService.getDevices();
     }
+
+    @PostMapping("/gossip")
+    public Object gossip() {
+
+        return meshSimulatorService.gossipOnce();
+    }
+
+    @PostMapping("/flush")
+    public String flush() {
+
+        var uploads =
+                meshSimulatorService.collectBridgeUploads();
+
+        for (var upload : uploads) {
+
+            bridgeIngestionService.ingest(
+                    upload.packet(),
+                    upload.bridgeNodeId(),
+                    3
+            );
+        }
+
+        return "bridge upload complete";
+    }
+
     @PostMapping("/reset")
     public String reset() {
 
-        meshService.reset();
+        meshSimulatorService.resetMesh();
 
         return "mesh reset";
     }

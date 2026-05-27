@@ -1,36 +1,35 @@
 package com.example.OFFUPI.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
+
+import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 @Service
 public class IdempotencyService {
 
-        private final StringRedisTemplate redisTemplate;
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
-        @Value("${upi.mesh.idempotency-ttl-seconds}")
-        private long ttlSeconds;
+    @Value("${upi.mesh.idempotency-ttl-seconds:86400}")
+    private long ttlSeconds;
 
-        public IdempotencyService(StringRedisTemplate redisTemplate) {
-            this.redisTemplate = redisTemplate;
-        }
+    public boolean claim(String packetHash) {
 
-        public boolean claim(String packetHash) {
+        Boolean success =
+                redisTemplate.opsForValue()
+                        .setIfAbsent(
+                                packetHash,
+                                "processed",
+                                ttlSeconds,
+                                TimeUnit.SECONDS
+                        );
 
-            Boolean success = redisTemplate.opsForValue()
-                    .setIfAbsent(
-                            packetHash,
-                            "claimed",
-                            Duration.ofSeconds(ttlSeconds)
-                    );
-
-            return Boolean.TRUE.equals(success);
-        }
-
-        public void clear(String packetHash) {
-            redisTemplate.delete(packetHash);
-        }
+        return Boolean.TRUE.equals(success);
     }
+}
