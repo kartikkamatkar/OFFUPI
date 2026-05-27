@@ -45,7 +45,7 @@ public class MetricsService {
                                 "retry_total"
                         )
                         .description(
-                                "Total retries"
+                                "Total retry attempts"
                         )
                         .register(registry);
 
@@ -54,7 +54,7 @@ public class MetricsService {
                                 "dlq_total"
                         )
                         .description(
-                                "Total DLQ events"
+                                "Total dead letter queue events"
                         )
                         .register(registry);
 
@@ -63,7 +63,7 @@ public class MetricsService {
                                 "mesh_packets_total"
                         )
                         .description(
-                                "Total mesh packets"
+                                "Total mesh packets injected"
                         )
                         .register(registry);
     }

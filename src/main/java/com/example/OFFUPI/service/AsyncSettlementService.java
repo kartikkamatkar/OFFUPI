@@ -1,8 +1,8 @@
 package com.example.OFFUPI.service;
 
 import com.example.OFFUPI.crypto.HybridCryptoService;
-import com.example.OFFUPI.event.PaymentEvent;
 import com.example.OFFUPI.entity.PaymentInstruction;
+import com.example.OFFUPI.event.PaymentEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 public class AsyncSettlementService {
 
     private static final Logger log =
-            LoggerFactory.getLogger(AsyncSettlementService.class);
+            LoggerFactory.getLogger(
+                    AsyncSettlementService.class
+            );
 
     @Autowired
     private HybridCryptoService cryptoService;
@@ -22,7 +24,9 @@ public class AsyncSettlementService {
     @Autowired
     private SettlementService settlementService;
 
-    public void process(PaymentEvent event) {
+    public void process(
+            PaymentEvent event
+    ) {
 
         try {
 
@@ -33,7 +37,8 @@ public class AsyncSettlementService {
 
             PaymentInstruction instruction =
                     cryptoService.decrypt(
-                            event.getPacket().getCiphertext()
+                            event.getPacket()
+                                    .getCiphertext()
                     );
 
             settlementService.settle(
@@ -56,6 +61,8 @@ public class AsyncSettlementService {
                     e.getMessage(),
                     e
             );
+
+            throw new RuntimeException(e);
         }
     }
 }

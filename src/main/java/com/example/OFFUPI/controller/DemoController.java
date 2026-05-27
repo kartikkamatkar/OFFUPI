@@ -2,6 +2,7 @@ package com.example.OFFUPI.controller;
 
 import com.example.OFFUPI.dto.SendMoneyRequest;
 import com.example.OFFUPI.entity.MeshPacket;
+import com.example.OFFUPI.service.BridgeIngestionService;
 import com.example.OFFUPI.service.DemoService;
 import com.example.OFFUPI.service.MeshSimulatorService;
 import com.example.OFFUPI.service.MetricsService;
@@ -22,6 +23,9 @@ public class DemoController {
 
     @Autowired
     private MeshSimulatorService meshSimulatorService;
+
+    @Autowired
+    private BridgeIngestionService bridgeIngestionService;
 
     @PostMapping("/send")
     public String send(
@@ -44,6 +48,12 @@ public class DemoController {
 
         metricsService.incrementMeshPackets();
 
-        return "Packet injected into mesh successfully";
+        bridgeIngestionService.ingest(
+                packet,
+                "phone-bridge",
+                3
+        );
+
+        return "Packet injected and sent to Kafka successfully";
     }
 }

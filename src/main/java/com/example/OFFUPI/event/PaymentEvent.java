@@ -1,4 +1,5 @@
 package com.example.OFFUPI.event;
+
 import com.example.OFFUPI.entity.MeshPacket;
 
 public class PaymentEvent {
@@ -14,10 +15,12 @@ public class PaymentEvent {
     public PaymentEvent() {
     }
 
-    public PaymentEvent(String packetHash,
-                        String bridgeNodeId,
-                        int hopCount,
-                        MeshPacket packet) {
+    public PaymentEvent(
+            String packetHash,
+            String bridgeNodeId,
+            int hopCount,
+            MeshPacket packet
+    ) {
 
         this.packetHash = packetHash;
         this.bridgeNodeId = bridgeNodeId;

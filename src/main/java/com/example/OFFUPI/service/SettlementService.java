@@ -115,9 +115,11 @@ public class SettlementService {
         tx.setAmount(amount);
 
         tx.setSignedAt(
-                Instant.ofEpochMilli(
+                instruction.getSignedAt() != null
+                        ? Instant.ofEpochMilli(
                         instruction.getSignedAt()
                 )
+                        : Instant.now()
         );
 
         tx.setSettledAt(

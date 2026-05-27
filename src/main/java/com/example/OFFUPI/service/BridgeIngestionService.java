@@ -1,13 +1,11 @@
 package com.example.OFFUPI.service;
 
 import com.example.OFFUPI.crypto.HybridCryptoService;
-import com.example.OFFUPI.event.PaymentEvent;
-import com.example.OFFUPI.kafka.producer.PaymentEventProducer;
 import com.example.OFFUPI.entity.MeshPacket;
 import com.example.OFFUPI.entity.PaymentInstruction;
-import com.example.OFFUPI.entity.Transaction;
-
+import com.example.OFFUPI.event.PaymentEvent;
 import com.example.OFFUPI.kafka.producer.PaymentEventProducer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +19,15 @@ import java.time.Instant;
 public class BridgeIngestionService {
 
     private static final Logger log =
-            LoggerFactory.getLogger(BridgeIngestionService.class);
+            LoggerFactory.getLogger(
+                    BridgeIngestionService.class
+            );
 
     @Autowired
     private HybridCryptoService crypto;
 
     @Autowired
     private IdempotencyService idempotency;
-
-    @Autowired
-    private SettlementService settlement;
 
     @Autowired
     private PaymentEventProducer producer;
@@ -47,9 +44,14 @@ public class BridgeIngestionService {
         try {
 
             String packetHash =
-                    crypto.hashCiphertext(packet.getCiphertext());
+                    crypto.hashCiphertext(
+                            packet.getCiphertext()
+                    );
 
-            // ---- Idempotency Check ----
+            // =========================
+            // IDEMPOTENCY CHECK
+            // =========================
+
             if (!idempotency.claim(packetHash)) {
 
                 log.info(
@@ -58,16 +60,23 @@ public class BridgeIngestionService {
                         bridgeNodeId
                 );
 
-                return IngestResult.duplicate(packetHash);
+                return IngestResult.duplicate(
+                        packetHash
+                );
             }
 
-            // ---- Decrypt Packet ----
+            // =========================
+            // DECRYPT PACKET
+            // =========================
+
             PaymentInstruction instruction;
 
             try {
 
                 instruction =
-                        crypto.decrypt(packet.getCiphertext());
+                        crypto.decrypt(
+                                packet.getCiphertext()
+                        );
 
             } catch (Exception e) {
 
@@ -83,10 +92,15 @@ public class BridgeIngestionService {
                 );
             }
 
-            // ---- Replay Protection ----
+            // =========================
+            // REPLAY PROTECTION
+            // =========================
+
             long ageSeconds =
-                    (Instant.now().toEpochMilli()
-                            - instruction.getSignedAt()) / 1000;
+                    (
+                            Instant.now().toEpochMilli()
+                                    - instruction.getSignedAt()
+                    ) / 1000;
 
             if (ageSeconds > maxAgeSeconds) {
 
@@ -110,13 +124,17 @@ public class BridgeIngestionService {
                 );
             }
 
-            // ---- Publish Kafka Event ----
-            PaymentEvent event = new PaymentEvent(
-                    packetHash,
-                    bridgeNodeId,
-                    hopCount,
-                    packet
-            );
+            // =========================
+            // PUBLISH TO KAFKA
+            // =========================
+
+            PaymentEvent event =
+                    new PaymentEvent(
+                            packetHash,
+                            bridgeNodeId,
+                            hopCount,
+                            packet
+                    );
 
             producer.publish(event);
 
@@ -125,15 +143,18 @@ public class BridgeIngestionService {
                     packetHash.substring(0, 12) + "..."
             );
 
-            // ---- Settlement ----
-            Transaction tx = settlement.settle(
-                    instruction,
-                    packetHash,
-                    bridgeNodeId,
-                    hopCount
-            );
+            // =========================
+            // IMPORTANT:
+            // NO DIRECT SETTLEMENT HERE
+            // Kafka consumer handles settlement
+            // =========================
 
-            return IngestResult.settled(packetHash, tx);
+            return new IngestResult(
+                    "EVENT_PUBLISHED",
+                    packetHash,
+                    null,
+                    null
+            );
 
         } catch (Exception e) {
 
@@ -150,9 +171,9 @@ public class BridgeIngestionService {
         }
     }
 
-    // ===========================
+    // =========================
     // RESULT RECORD
-    // ===========================
+    // =========================
 
     public record IngestResult(
             String outcome,
@@ -161,21 +182,10 @@ public class BridgeIngestionService {
             Long transactionId
     ) {
 
-        public static IngestResult settled(
-                String hash,
-                Transaction tx
-        ) {
-            return new IngestResult(
-                    "SETTLED",
-                    hash,
-                    null,
-                    tx.getId()
-            );
-        }
-
         public static IngestResult duplicate(
                 String hash
         ) {
+
             return new IngestResult(
                     "DUPLICATE_DROPPED",
                     hash,
@@ -188,6 +198,7 @@ public class BridgeIngestionService {
                 String hash,
                 String reason
         ) {
+
             return new IngestResult(
                     "INVALID",
                     hash,
