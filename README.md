@@ -22,121 +22,231 @@ This repository contains the core Spring Boot backend alongside an in-memory net
 
 • **⛔ Replay & Tamper Defenses** — Cryptographic signatures and explicit temporal windows reject manipulated, stale, or replayed packets before they ever interact with the core banking database.
 
-System Architecture
-The workflow splits cleanly into an offline ad-hoc mesh layer and a traditional, high-throughput financial backend pipeline:
+---
 
-1. Conceptual Data Flow
-[ OFFLINE ENVIRONMENT ]                                 [ ONLINE CENTRAL BACKEND ]
- 
- +------------------+     Mesh Gossip / Hops     +---------------+               +---------------------+
- |   Sender Node    | -------------------------> |  Bridge Node  | ------------> | Ingestion Controller |
- | (Signs & Encrypts|      (BLE / Wi-Fi Direct)  | (Gains WAN/4G)|  HTTPS POST   +---------------------+
- +------------------+                            +---------------+                          |
-                                                                                            v
- +------------------+                                                            +---------------------+
- | Relational DB    | <--- Atomic Database Transaction <------------------------- | Idempotency Check   |
- | Accounts/Ledger  |                                                            | (SHA-256 Cache Lock)|
- +------------------+                                                            +---------------------+
-                                                                                            |
-                                                                                            v
- +------------------+                                                            +---------------------+
- | Kafka Event Bus  | <--- Publish Settlement Event (Async Notification) -------- | Cryptographic Decrypt|
- +------------------+                                                            | (RSA Private Key)   |
-                                                                                 +---------------------+
-2. Deep-Dive Backend Ingestion Pipeline
-Ingest & Hash: The backend receives an payload containment wrapper (MeshPacket). It immediately computes a SHA-256 digest of the immutable ciphertext.
+## 🏗️ System Architecture
 
-Idempotency Gatekeeping: The digest is treated as a unique transaction token and claimed atomically via the IdempotencyService. If the token already exists in the lock-cache, it is dropped as a duplicate.
+The workflow splits cleanly into an offline ad-hoc mesh layer and a traditional, high-throughput financial backend pipeline.
 
-Envelope Decryption: The unique packet is handed to the HybridCryptoService. The system unwraps the ephemeral AES key using the server’s RSA private key, then decrypts the core payment instructions using AES-GCM-256. Any integrity validation failure drops the packet instantly.
+### 1️⃣ Conceptual Data Flow
 
-Temporal Validation: The internal timestamp (signedAt) is evaluated. Packets older than the max age threshold are flagged as expired to thwart replay attempts.
+```
+[ OFFLINE ENVIRONMENT ]                              [ ONLINE CENTRAL BACKEND ]
 
-Atomic Settlement: The decoupled instruction is handled inside a isolated @Transactional boundary where account balances are atomically verified, adjusted, and preserved into an immutable transaction ledger.
+ +------------------+    Mesh Gossip/Hops    +---------------+               +---------------------+
+ |  Sender Node     | ──────────────────────→ | Bridge Node   | ────────────→ | Ingestion Controller|
+ | (Signs & Encrypts|   (BLE / Wi-Fi Direct)  | (Gains 4G)    |  HTTPS POST   +---------------------+
+ +------------------+                         +---------------+                         │
+                                                                                        ↓
+ +------------------+                                                        +---------------------+
+ | Account Ledger   | ←─── Atomic DB Transaction ←───────────────────────── | Idempotency Check   |
+ | & Balances       |                                                        | (SHA-256 Cache Lock)|
+ +------------------+                                                        +---------------------+
+                                                                                        │
+                                                                                        ↓
+ +------------------+                                                        +---------------------+
+ | Kafka Event Bus  | ←─ Settlement Event ←────────────────────────────────── | Crypto Decrypt      |
+ | (Notifications)  |                                                        | (RSA Private Key)   |
+ +------------------+                                                        +---------------------+
+```
 
-Core Infrastructure Stack
-Runtime Engine: Java 21 & Spring Boot 3.5.4
+### 2️⃣ Deep-Dive Backend Ingestion Pipeline
 
-Application Framework: Spring Web (REST API Management), Spring Data JPA (Data Abstraction)
+1. **📥 Ingest & Hash** — The backend receives a payload wrapper (MeshPacket). It immediately computes a SHA-256 digest of the immutable ciphertext.
 
-Security & Cryptography: BouncyCastle Provider (bcprov-jdk18on)
+2. **🔐 Idempotency Gatekeeping** — The digest is treated as a unique transaction token and claimed atomically via `IdempotencyService`. If the token already exists in the lock-cache, it is dropped as a duplicate.
 
-Enterprise Message Bus: Apache Kafka (Asynchronous Event Distribution)
+3. **🔓 Envelope Decryption** — The unique packet is handed to `HybridCryptoService`. The system unwraps the ephemeral AES key using the server's RSA private key, then decrypts the core payment instructions using AES-GCM-256. Any integrity validation failure drops the packet instantly.
 
-Storage & Caching Layer: PostgreSQL (Financial Ledger Records), Redis (Distributed Invalidation Cache)
+4. **⏰ Temporal Validation** — The internal timestamp (`signedAt`) is evaluated. Packets older than the max age threshold are flagged as expired to thwart replay attempts.
 
-User Interface: Thymeleaf (Interactive Simulation Management Dashboard)
+5. **✅ Atomic Settlement** — The decoupled instruction is handled inside an isolated `@Transactional` boundary where account balances are atomically verified, adjusted, and preserved into an immutable transaction ledger.
 
-Getting Started
-Prerequisites
-Java Development Kit (JDK): Version 21 or higher
+---
 
-Containerization Engine: Docker & Docker Compose (for rapid infrastructure provisioning)
+## ⚙️ Core Infrastructure Stack
 
-Setup Environment
-Clone the repository and navigate to the project root directory.
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Runtime Engine** | Java 21 & Spring Boot 3.5.4 | Application runtime & framework |
+| **Web Framework** | Spring Web (REST API) | HTTP endpoints & dashboard serving |
+| **Data Layer** | Spring Data JPA | Object-relational mapping |
+| **Cryptography** | BouncyCastle (bcprov-jdk18on) | RSA-OAEP & AES-256-GCM encryption |
+| **Message Bus** | Apache Kafka | Asynchronous event distribution |
+| **Primary DB** | PostgreSQL (JDBC) | Financial ledger & account records |
+| **Cache Layer** | Redis | Distributed idempotency store (optional) |
+| **Templates** | Thymeleaf | Interactive simulation dashboard |
+| **Observability** | Micrometer + Prometheus | Metrics collection & scraping |
+| **Build Tool** | Maven Wrapper (`mvnw`) | Dependency & build management |
 
-Spin up the prerequisite streaming and messaging services using Docker:
+---
 
-Bash
-docker compose up -d
-Note: By default, the application is configured to fall back to an in-memory database and local memory-map for idempotency tracking if direct environment variables for PostgreSQL and Redis are absent, making local onboarding simple.
+## 🚀 Getting Started
 
-Run the Server
-Execute the platform using the bundled Maven Wrapper:
+### ✅ Prerequisites
 
-Bash
-# Unix/macOS
-./mvnw spring-boot:run
+• **Java Development Kit (JDK)** — Version 21 or higher
+  ```bash
+  java -version
+  ```
 
-# Windows PowerShell
-.\mvnw.cmd spring-boot:run
-Once the log outputs Started OffupiApplication, access the simulation engine via your browser:
-👉 http://localhost:8080
+• **Docker & Docker Compose** — For rapid infrastructure provisioning
+  ```bash
+  docker --version
+  ```
 
-Run Verification Suite
-Execute the integration test suite, which includes automated thread concurrency validations and cryptographic tampering test matrices:
+### 📦 Setup Environment
 
-Bash
+1. **Clone and navigate to the project:**
+   ```bash
+   cd /path/to/OFFUPI
+   ```
+
+2. **Spin up prerequisite services (Kafka, Zookeeper):**
+   ```bash
+   docker-compose up -d
+   ```
+   > Note: The application falls back to in-memory DB and local memory-map for idempotency if PostgreSQL/Redis env vars are absent.
+
+3. **Start the backend server:**
+
+   **Unix/macOS:**
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+
+   **Windows PowerShell:**
+   ```powershell
+   .\mvnw.cmd spring-boot:run
+   ```
+
+4. **Access the dashboard:**
+   ```
+   👉 http://localhost:8080
+   ```
+   Once you see `Started OffupiApplication` in the logs, open your browser.
+
+5. **Stop the server:**
+   ```bash
+   Ctrl+C
+   ```
+
+### 🧪 Run Verification Suite
+
+Execute the integration test suite (includes concurrency validation & crypto tampering tests):
+
+```bash
 ./mvnw test
-Detailed Step-by-Step Demo Flow
-To easily witness the mechanics of the engine without external hardware, navigate to the web dashboard:
+```
 
-Generate Outbound Tx: Enter account parameters and trigger "Inject into Mesh". The system creates a PaymentInstruction, encrypts it using the server's public key, and stages it on a virtual isolated simulated device node.
+---
 
-Execute Gossip Matrix: Click "Run Gossip Round". You will observe the packet hop between simulated nodes in real time. Notice the Time-to-Live (TTL) counter decrement on each consecutive hop.
+## 📊 Detailed Step-by-Step Demo Flow
 
-Trigger Gateway Uplink: Click "Flush Bridges". This action simulates an edge node transitioning back into cellular range. The edge node sends the accumulated packets to the server ingestion endpoint.
+To easily witness the mechanics without external hardware, navigate to the web dashboard:
 
-Observe Ledger Integrity: Inspect the Ledger logs at the base of the UI dashboard. To test the robustness of the system, inject a single transaction into multiple nodes simultaneously and execute a multi-bridge flush. The dashboard ledger will show exactly one successful mutation, proving the idempotency layer caught the duplicate transmissions.
+### 1️⃣ Generate Outbound Transaction
 
-Operational Architecture & Component Breakdown
+• Click **"📤 Inject into Mesh"**
+• Enter account parameters (sender, receiver, amount)
+• The system creates a `PaymentInstruction`, encrypts it using the server's public key, and stages it on a virtual simulated device node.
+
+### 2️⃣ Execute Gossip Matrix
+
+• Click **"🔄 Run Gossip Round"** (repeat as needed)
+• Observe the packet hop between simulated nodes in real time.
+• Notice the **Time-to-Live (TTL)** counter decrement on each consecutive hop.
+
+### 3️⃣ Trigger Gateway Uplink
+
+• Click **"📡 Flush Bridges"**
+• This action simulates an edge node transitioning back into cellular range.
+• The edge node sends accumulated packets to the server ingestion endpoint.
+
+### 4️⃣ Observe Ledger Integrity
+
+• Inspect the **Ledger logs** at the base of the UI dashboard.
+• To test robustness: inject a single transaction into multiple nodes simultaneously and execute a multi-bridge flush.
+• The dashboard ledger will show **exactly one successful mutation**, proving the idempotency layer caught duplicates. ✅
+
+---
+
+## 📁 Operational Architecture & Component Breakdown
+
+```
 src/main/java/com/example/OFFUPI/
-├── config/                 # Infrastructure, Kafka Streams, and Cache configurations
-├── controller/             # Simulation management endpoints and REST Entrypoints
-├── crypto/                 # Low-level RSA/AES hybrid key wrappers & security logic
-├── entity/                 # Account balances and strict ledger schemas
-├── repository/             # Database access layers for state persistence
-└── service/                # Core domain orchestration engine
-    ├── BridgeIngestionService.java   # Evaluates, unlocks, and processes incoming mesh waves
-    ├── IdempotencyService.java       # Atomic token verification (ConcurrentMap/Redis implementation)
-    ├── HybridCryptoService.java     # Payload encryption and decryption engine
-    ├── SettlementService.java       # Atomic ACID ledger state mutator
-    └── MeshSimulatorService.java     # Background processing for virtual P2P gossip
-Production Readiness: Gaps to Bridge
-This repository serves as a functional demonstration architectural prototype. Transitioning this system to a commercial deployment requires the following modifications:
+├── config/                 # 🔧 Infrastructure, Kafka Streams, & Cache configurations
+├── controller/             # 🌐 Simulation management endpoints & REST entrypoints
+├── crypto/                 # 🔐 RSA/AES hybrid key wrappers & security logic
+├── entity/                 # 💾 Account balances & strict ledger schemas
+├── repository/             # 🗂️ Database access layers for state persistence
+├── dto/                    # 📦 Data transfer objects (SendMoneyRequest, PaymentEvent)
+├── event/                  # 📨 Event domain objects
+├── kafka/                  # 📡 Consumer & producer implementations
+└── service/                # ⚙️ Core domain orchestration engine
+    ├── BridgeIngestionService.java   # 🚪 Evaluates, unlocks, & processes incoming mesh waves
+    ├── IdempotencyService.java       # 🔒 Atomic token verification (ConcurrentMap/Redis)
+    ├── HybridCryptoService.java      # 🔐 Payload encryption & decryption engine
+    ├── SettlementService.java        # ✅ Atomic ACID ledger state mutator
+    ├── MeshSimulatorService.java     # 🌐 Background processing for virtual P2P gossip
+    ├── DemoService.java              # 🎮 Demo helper & virtual device orchestration
+    └── MetricsService.java           # 📈 Observability & metrics tracking
+```
 
-Component	Current Prototype State	Production Engineering Requirement
-Idempotency Store	Monolithic Local ConcurrentHashMap	High-throughput distributed cache (e.g., Redis via atomic SETNX commands with strict TTL expirations).
-Secret Management	Local memory initialization on booting sequence	Integration with a FIPS 140-2 Level 3 Hardware Security Module (HSM) or Cloud KMS provider.
-Transport Layer	Emulated memory-swapping routine	Production mobile platform integration leveraging Android/iOS CoreBluetooth / Wi-Fi Aware APIs.
-Ledger Audits	Traditional Relational DBMS Rows	Double-entry bookkeeping ledger using append-only immutable tables or cryptographic ledger databases.
-Core Limitations of the Concept
-Asymmetric Balance Trust: Because the receiver node cannot safely check the sender's central bank account balance while completely offline, transactions operate as cryptographically signed IOUs. This creates a risk of bad debts if the sender overdraws their account. To fix this, production environments must use localized pre-funded balances or hardware-enforced secure elements.
+---
 
-Race Conditions on Double-Spending: If a sender constructs two different transactions using the same funds and routes them through two separate physical directions, the transaction that reaches the online backend first will be cleared, causing the second transaction to fail upon arrival.
+## 📋 Production Readiness: Gaps to Bridge
 
-Troubleshooting
-Database Port Violations: If you run into database user authentication issues or port conflicts, confirm no local instances of PostgreSQL or Redis are conflicting with your Docker containers, or update the src/main/resources/application.properties settings.
+This repository serves as a **functional demonstration & architectural prototype**. Transitioning to production requires:
 
-Container Networking Loops: If Kafka fails to boot cleanly, ensure Docker Desktop has allocated at least 2GB of active RAM to your environment.
+| Component | Current Prototype | Production Requirement |
+|-----------|------------------|----------------------|
+| **Idempotency Store** | Monolithic Local `ConcurrentHashMap` | 🔴 High-throughput distributed cache (Redis with atomic SETNX + TTL) |
+| **Secret Management** | Local memory initialization on startup | 🔴 FIPS 140-2 Level 3 HSM or Cloud KMS provider |
+| **Transport Layer** | Emulated memory-swapping routine | 🔴 Production mobile (Android/iOS CoreBluetooth / Wi-Fi Aware APIs) |
+| **Ledger Audits** | Traditional Relational DBMS rows | 🔴 Double-entry bookkeeping or append-only immutable tables |
+| **Authentication** | None (demo only) | 🔴 Mutual TLS or signed bridge-node certificates |
+| **Rate Limiting** | None | 🔴 Per-bridge-node + per-sender velocity checks |
+
+---
+
+## ⚠️ Core Limitations of the Concept
+
+• **❌ Asymmetric Balance Trust** — The receiver node cannot safely check the sender's central bank account balance while completely offline. Transactions operate as cryptographically signed IOUs. Production must use localized pre-funded balances or hardware-enforced secure elements.
+
+• **❌ Race Conditions on Double-Spending** — If a sender constructs two different transactions using the same funds and routes them through two separate directions, the transaction reaching the backend first will clear; the second will fail upon arrival.
+
+• **❌ Real-World BLE Challenges** — Background BLE on Android is heavily throttled since Android 8. iOS peripheral mode is locked down. Real-world device-to-device mesh is a hard engineering problem and is not addressed in this simulator.
+
+---
+
+## 🔧 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| **`FATAL: password authentication failed for user "${DB_NAME}"`** | Set `DB_NAME` and `DB_PASS` env vars or edit `application.properties` to point to a reachable Postgres instance. |
+| **Port 8080 already in use** | Change `server.port` in `src/main/resources/application.properties` |
+| **Docker networking issues** | Ensure Docker Desktop/Engine has ≥2GB RAM allocated. Run `docker-compose logs` to debug. |
+| **Kafka fails to boot** | Verify no local Kafka instance conflicts. Check `docker ps` and clean up stale containers. |
+| **First mvnw run hangs** | Maven is downloading dependencies (~80 MB). Give it 2–3 minutes on a normal connection. |
+| **Tests fail intermittently** | Concurrency tests are timing-sensitive. Run 3x; if persistent, report output. |
+
+---
+
+## 📜 License
+
+**Demo code** — no license included. Use for learning and experiments. 📚
+
+---
+
+## 🎯 Next Steps
+
+Choose one of the following to extend the project:
+
+• **Add Postgres + Redis services to `docker-compose.yml`** for a complete one-command stack
+• **Insert beginner-friendly inline comments** into main Java service files
+• **Build mobile client** (Android/iOS) to test real device-to-device mesh
+• **Integrate with real UPI backends** for production-grade settlement
+• **Add comprehensive API documentation** (Swagger/OpenAPI)
+
+Reach out with questions or feedback! 🚀
