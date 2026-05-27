@@ -5,14 +5,10 @@ import com.example.OFFUPI.entity.PaymentInstruction;
 import com.example.OFFUPI.entity.Transaction;
 import com.example.OFFUPI.repository.AccountRepository;
 import com.example.OFFUPI.repository.TransactionRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +28,9 @@ public class SettlementService {
     @Autowired
     private TransactionRepository transactions;
 
+    @Autowired
+    private MetricsService metricsService;
+
     @Transactional
     public Transaction settle(
             PaymentInstruction instruction,
@@ -40,22 +39,34 @@ public class SettlementService {
             int hopCount
     ) {
 
-        Account sender = accounts.findById(instruction.getSenderVpa())
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Unknown sender VPA: "
-                                        + instruction.getSenderVpa()));
+        Account sender = accounts.findById(
+                instruction.getSenderVpa()
+        ).orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Unknown sender VPA: "
+                                + instruction.getSenderVpa()
+                )
+        );
 
-        Account receiver = accounts.findById(instruction.getReceiverVpa())
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Unknown receiver VPA: "
-                                        + instruction.getReceiverVpa()));
+        Account receiver = accounts.findById(
+                instruction.getReceiverVpa()
+        ).orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Unknown receiver VPA: "
+                                + instruction.getReceiverVpa()
+                )
+        );
 
-        BigDecimal amount = instruction.getAmount();
+        BigDecimal amount =
+                instruction.getAmount();
 
         if (amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
+
+            metricsService.incrementFailure();
+
+            throw new IllegalArgumentException(
+                    "Amount must be positive"
+            );
         }
 
         if (sender.getBalance().compareTo(amount) < 0) {
@@ -67,6 +78,8 @@ public class SettlementService {
                     amount
             );
 
+            metricsService.incrementFailure();
+
             return recordRejected(
                     instruction,
                     packetHash,
@@ -75,33 +88,57 @@ public class SettlementService {
             );
         }
 
-        sender.setBalance(sender.getBalance().subtract(amount));
+        sender.setBalance(
+                sender.getBalance().subtract(amount)
+        );
 
-        receiver.setBalance(receiver.getBalance().add(amount));
+        receiver.setBalance(
+                receiver.getBalance().add(amount)
+        );
 
         accounts.save(sender);
+
         accounts.save(receiver);
 
         Transaction tx = new Transaction();
 
         tx.setPacketHash(packetHash);
-        tx.setSenderVpa(instruction.getSenderVpa());
-        tx.setReceiverVpa(instruction.getReceiverVpa());
+
+        tx.setSenderVpa(
+                instruction.getSenderVpa()
+        );
+
+        tx.setReceiverVpa(
+                instruction.getReceiverVpa()
+        );
+
         tx.setAmount(amount);
 
         tx.setSignedAt(
-                Instant.ofEpochMilli(instruction.getSignedAt())
+                Instant.ofEpochMilli(
+                        instruction.getSignedAt()
+                )
         );
 
-        tx.setSettledAt(Instant.now());
+        tx.setSettledAt(
+                Instant.now()
+        );
 
-        tx.setBridgeNodeId(bridgeNodeId);
+        tx.setBridgeNodeId(
+                bridgeNodeId
+        );
 
-        tx.setHopCount(hopCount);
+        tx.setHopCount(
+                hopCount
+        );
 
-        tx.setStatus(Transaction.Status.SETTLED);
+        tx.setStatus(
+                Transaction.Status.SETTLED
+        );
 
         transactions.save(tx);
+
+        metricsService.incrementSuccess();
 
         log.info(
                 "SETTLED ₹{} from {} to {}",
@@ -124,23 +161,39 @@ public class SettlementService {
 
         tx.setPacketHash(packetHash);
 
-        tx.setSenderVpa(instruction.getSenderVpa());
-
-        tx.setReceiverVpa(instruction.getReceiverVpa());
-
-        tx.setAmount(instruction.getAmount());
-
-        tx.setSignedAt(
-                Instant.ofEpochMilli(instruction.getSignedAt())
+        tx.setSenderVpa(
+                instruction.getSenderVpa()
         );
 
-        tx.setSettledAt(Instant.now());
+        tx.setReceiverVpa(
+                instruction.getReceiverVpa()
+        );
 
-        tx.setBridgeNodeId(bridgeNodeId);
+        tx.setAmount(
+                instruction.getAmount()
+        );
 
-        tx.setHopCount(hopCount);
+        tx.setSignedAt(
+                Instant.ofEpochMilli(
+                        instruction.getSignedAt()
+                )
+        );
 
-        tx.setStatus(Transaction.Status.REJECTED);
+        tx.setSettledAt(
+                Instant.now()
+        );
+
+        tx.setBridgeNodeId(
+                bridgeNodeId
+        );
+
+        tx.setHopCount(
+                hopCount
+        );
+
+        tx.setStatus(
+                Transaction.Status.REJECTED
+        );
 
         return transactions.save(tx);
     }
