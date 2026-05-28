@@ -38,7 +38,6 @@ public class DemoService {
             log.info("Seeded 4 Static accounts");
         }
     }
-
     /**
      * Simulates the sender's phone:
      *   1. Build a PaymentInstruction with a fresh nonce + signedAt timestamp.
