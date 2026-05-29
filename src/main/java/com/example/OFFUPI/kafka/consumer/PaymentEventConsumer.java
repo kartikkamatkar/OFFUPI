@@ -31,9 +31,10 @@ public class PaymentEventConsumer {
             topics = "payment-ingestion",
             groupId = "offupi-group"
     )
-    public void consume(
-            PaymentEvent event
-    ) {
+    public void consume(PaymentEvent event) {
+
+        log.info("KAFKA CONSUMER RECEIVED EVENT");
+        log.info("Packet Hash: {}", event.getPacketHash());
 
         try {
 
