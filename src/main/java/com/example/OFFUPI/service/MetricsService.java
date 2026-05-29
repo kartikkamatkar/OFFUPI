@@ -21,6 +21,11 @@ public class MetricsService {
     public MetricsService(
             MeterRegistry registry
     ) {
+        Counter.builder("settled_transactions_total")
+                .register(registry);
+
+        Counter.builder("offline_payments_total")
+                .register(registry);
 
         paymentSuccessCounter =
                 Counter.builder(
