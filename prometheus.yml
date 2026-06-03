@@ -1,20 +1,44 @@
+# ============================================================================
+# PROMETHEUS CONFIGURATION
+# Prometheus scrapes (collects) metrics from various services
+# ============================================================================
+
+# Global settings applied to all scrape jobs
 global:
+  # How often to collect metrics (5 seconds = very frequent)
   scrape_interval: 5s
 
+# List of targets (services) to scrape metrics from
 scrape_configs:
 
+  # ==========================================================================
+  # JOB 1: SPRING BOOT APPLICATION METRICS
+  # ==========================================================================
   - job_name: "offupi"
+    # Path where Spring Boot Actuator exposes Prometheus metrics
     metrics_path: "/actuator/prometheus"
+
+    # List of targets to scrape
     static_configs:
       - targets:
+          # offupi-app is container name, 8080 is app port
           - "offupi-app:8080"
 
+  # ==========================================================================
+  # JOB 2: REDIS METRICS (via redis-exporter)
+  # ==========================================================================
   - job_name: "redis"
+    # No custom metrics path - exporter handles it
     static_configs:
       - targets:
+          # redis-exporter container on port 9121
           - "redis-exporter:9121"
 
+  # ==========================================================================
+  # JOB 3: KAFKA METRICS (via kafka-exporter)
+  # ==========================================================================
   - job_name: "kafka"
     static_configs:
       - targets:
+          # kafka-exporter container on port 9308
           - "kafka-exporter:9308"

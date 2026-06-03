@@ -1,109 +1,227 @@
+# ============================================================================
+# DOCKER COMPOSE CONFIGURATION
+# This file defines and runs all the services needed for the application:
+# - PostgreSQL (database)
+# - Redis (cache)
+# - Kafka (message queue)
+# - Zookeeper (Kafka dependency)
+# - Prometheus (metrics collection)
+# - Grafana (dashboards)
+# - The actual Spring Boot application
+# ============================================================================
+
+# Docker Compose version (format version, not application version)
+version: '3.8'
+
+# All services (containers) that will run
 services:
 
+  # ==========================================================================
+  # POSTGRESQL DATABASE SERVICE
+  # ==========================================================================
   postgres:
+    # Docker image to use: PostgreSQL version 16
     image: postgres:16
+    
+    # Name of the container (used for internal networking)
     container_name: offupi-postgres
+    
+    # Environment variables passed to the container
     environment:
-      POSTGRES_DB: offupi
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgresql
+      POSTGRES_DB: offupi        # Database name to create
+      POSTGRES_USER: postgres     # Database admin username
+      POSTGRES_PASSWORD: postgresql  # Database admin password
+    
+    # Port mapping: [host_port]:[container_port]
+    # Host port 5433 → Container port 5432 (PostgreSQL default)
+    # Access from host machine: localhost:5433
     ports:
       - "5433:5432"
+    
+    # Persistent volume - data survives container restart
+    # Stores database files on host machine
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    
+    # Automatically restart if container crashes
     restart: always
 
+  # ==========================================================================
+  # REDIS CACHE SERVICE (Idempotency storage)
+  # ==========================================================================
   redis:
+    # Redis version 7 (in-memory database)
     image: redis:7
     container_name: offupi-redis
     ports:
-      - "6380:6379"
+      - "6380:6379"  # Host port 6380 → Container port 6379
     restart: always
 
+  # ==========================================================================
+  # REDIS EXPORTER (Metrics for Prometheus)
+  # ==========================================================================
   redis-exporter:
+    # Exporter that converts Redis metrics to Prometheus format
     image: oliver006/redis_exporter
     container_name: redis-exporter
+    
+    # Environment configuration
     environment:
-      REDIS_ADDR: redis://offupi-redis:6379
+      REDIS_ADDR: redis://offupi-redis:6379  # Address of Redis to monitor
+    
     ports:
-      - "9121:9121"
+      - "9121:9121"  # Prometheus scrapes metrics here
+    
+    # Only start after Redis is running
     depends_on:
       - redis
     restart: always
 
+  # ==========================================================================
+  # ZOOKEEPER (Required by Kafka - coordinates brokers)
+  # ==========================================================================
   zookeeper:
+    # Confluent's Zookeeper image
     image: confluentinc/cp-zookeeper:7.6.1
     container_name: offupi-zookeeper
+    
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: 2181  # Port Zookeeper listens on
+    
     ports:
-      - "2182:2181"
+      - "2182:2181"  # Host port 2182 → Container port 2181
     restart: always
 
+  # ==========================================================================
+  # KAFKA MESSAGE QUEUE (Async payment processing)
+  # ==========================================================================
   kafka:
+    # Confluent's Kafka image
     image: confluentinc/cp-kafka:7.6.1
     container_name: offupi-kafka
+    
+    # Kafka needs Zookeeper to work
     depends_on:
       - zookeeper
+    
     ports:
-      - "9093:9092"
+      - "9093:9092"  # Host port 9093 → Container port 9092
+    
     environment:
+      # Unique ID for this Kafka broker
       KAFKA_BROKER_ID: 1
+      
+      # Zookeeper connection string
       KAFKA_ZOOKEEPER_CONNECT: offupi-zookeeper:2181
+      
+      # Listeners: where Kafka accepts connections
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      
+      # Advertised listeners: what clients connect to
+      # Using container name for Docker internal networking
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://offupi-kafka:9092
+      
+      # Security protocol mapping
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      
+      # Which listener to use for internal broker communication
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      
+      # How many replicas for internal topics (1 = no replication)
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    
     restart: always
 
+  # ==========================================================================
+  # KAFKA EXPORTER (Metrics for Prometheus)
+  # ==========================================================================
   kafka-exporter:
+    # Exporter that converts Kafka metrics to Prometheus format
     image: danielqsj/kafka-exporter
     container_name: kafka-exporter
+    
+    # Command line arguments
     command:
-      - "--kafka.server=offupi-kafka:9092"
+      - "--kafka.server=offupi-kafka:9092"  # Kafka address to monitor
+    
     ports:
-      - "9308:9308"
+      - "9308:9308"  # Prometheus scrapes metrics here
+    
     depends_on:
       - kafka
     restart: always
 
+  # ==========================================================================
+  # PROMETHEUS (Metrics collection and storage)
+  # ==========================================================================
   prometheus:
+    # Prometheus monitoring system
     image: prom/prometheus
     container_name: offupi-prometheus
+    
     ports:
-      - "9091:9090"
+      - "9091:9090"  # Host port 9091 → Prometheus UI
+    
+    # Mount custom prometheus.yml configuration
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    
     restart: always
 
+  # ==========================================================================
+  # GRAFANA (Dashboards and visualization)
+  # ==========================================================================
   grafana:
+    # Grafana dashboard platform
     image: grafana/grafana
     container_name: offupi-grafana
+    
     ports:
-      - "3001:3000"
+      - "3001:3000"  # Host port 3001 → Grafana UI
+    
+    # Persistent volume for dashboards and settings
     volumes:
       - grafana-data:/var/lib/grafana
+    
     restart: always
 
+  # ==========================================================================
+  # OFFPUI SPRING BOOT APPLICATION
+  # ==========================================================================
   offupi-app:
+    # Build from Dockerfile in current directory
     build: .
     container_name: offupi-app
+    
+    # Wait for dependencies to start first
     depends_on:
       - postgres
       - redis
       - kafka
+    
+    # Port mapping
     ports:
-      - "8081:8080"
+      - "8081:8080"  # Host port 8081 → App port 8080
+    
+    # Override application.properties values for Docker environment
     environment:
+      # Database connection (using container names)
       SPRING_DATASOURCE_URL: jdbc:postgresql://offupi-postgres:5432/offupi
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgresql
+      
+      # Redis connection
       SPRING_DATA_REDIS_HOST: offupi-redis
       SPRING_DATA_REDIS_PORT: 6379
+      
+      # Kafka connection
       SPRING_KAFKA_BOOTSTRAP_SERVERS: offupi-kafka:9092
+    
     restart: always
 
+# ============================================================================
+# VOLUMES (Persistent data storage)
+# ============================================================================
 volumes:
-  postgres-data:
-  grafana-data:
+  postgres-data:   # Stores PostgreSQL database files
+  grafana-data:    # Stores Grafana dashboards and settings

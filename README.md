@@ -458,6 +458,31 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 | **Grafana Dashboard** | http://localhost:3000 | UI analytical visualizer (Admin/Admin) |
 | **Kafka Broker Cluster** | localhost:9092 | Real-time event transport stream |
 
+### 📊 Grafana Dashboard Export
+
+The pre-configured Grafana dashboard is available in:
+
+```text
+grafana-dashboard.json
+```
+
+**To import the dashboard:**
+
+1. Navigate to http://localhost:3000 (Grafana)
+2. Log in with credentials: **Admin** / **Admin**
+3. Go to **Dashboards** → **Import**
+4. Upload or paste the contents of `grafana-dashboard.json`
+5. Select your Prometheus data source
+6. Click **Import**
+
+The dashboard provides real-time visualization of:
+- Transaction throughput (TPS)
+- Cryptographic operation latencies
+- Redis cache hit/miss ratios
+- Database connection pool utilization
+- Kafka event ingestion rates
+- System CPU and memory metrics
+
 ---
 
 ## 🏆 Resume-Worthy Technical Achievements
@@ -628,4 +653,4 @@ This project demonstrates advanced concepts:
 
 ---
 
-**Made with ❤️ for the fintech and distributed systems community.**
+**Made with for the fintech and distributed systems community.**
