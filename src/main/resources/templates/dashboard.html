@@ -3,8 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Off UPI · Offline Mesh Payment Network</title>
+    <title>Off UPI · Zero-Connectivity Mesh Payment Network</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --bg-base: #ffffff;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --border-color: #000000;
+            
+            --primary: #000000;
+            --primary-glow: rgba(0, 0, 0, 0.05);
+            --accent: #000000;
+            --accent-glow: rgba(0, 0, 0, 0.05);
+            --success: #000000;
+            --success-glow: rgba(0, 0, 0, 0.05);
+            --warning: #000000;
+            --warning-glow: rgba(0, 0, 0, 0.05);
+            --danger: #000000;
+            --danger-glow: rgba(0, 0, 0, 0.05);
+            --muted: #000000;
+            
+            --font-display: 'Outfit', sans-serif;
+            --font-sans: 'Space Grotesk', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,840 +41,1714 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f4f6fa;
-            color: #1a1f36;
-            line-height: 1.5;
+            font-family: var(--font-sans);
+            background: var(--bg-base);
+            color: #000000;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            padding: 24px;
         }
 
         .app-container {
-            max-width: 1280px;
+            max-width: 1440px;
             margin: 0 auto;
-            padding: 28px 32px;
+            padding: 12px;
         }
 
-        /* Header */
+        /* Header Layout */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 32px;
-            flex-wrap: wrap;
-            gap: 16px;
+            padding: 20px 24px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            box-shadow: 4px 4px 0px #000000;
         }
+
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
+
         .logo-icon {
-            width: 44px;
-            height: 44px;
-            background: #0a2540;
-            border-radius: 14px;
+            width: 48px;
+            height: 48px;
+            background: #000000;
+            border: 2px solid #000000;
+            border-radius: 0px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 22px;
-            letter-spacing: -0.5px;
-        }
-        .logo-text h1 {
+            color: #ffffff;
             font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.4px;
-            color: #0a2540;
+            font-weight: 800;
         }
+
+        .logo-text h1 {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #000000;
+        }
+
         .logo-text p {
             font-size: 13px;
-            color: #5f6c84;
-            font-weight: 500;
-        }
-        .network-badge {
-            background: #eaf6ed;
-            padding: 8px 18px;
-            border-radius: 100px;
-            font-size: 13px;
+            color: #000000;
             font-weight: 600;
-            color: #1e7b4a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .status-badge {
+            background: #ffffff;
+            border: 2px solid #000000;
+            padding: 8px 16px;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #000000;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 2px 2px 0px #000000;
+            text-transform: uppercase;
         }
-        .network-badge .dot {
+
+        .status-badge .ping-dot {
             width: 8px;
             height: 8px;
-            background: #1e7b4a;
+            background: #000000;
             border-radius: 50%;
             display: inline-block;
         }
 
-        /* Grid Layout */
+        /* Top Simulation Visualization Section */
+        .visualizer-container {
+            margin-bottom: 24px;
+            position: relative;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 24px;
+            box-shadow: 4px 4px 0px #000000;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            min-height: 460px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 0px;
+            border: 2px solid #000000;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-height: 400px;
+            background: #ffffff;
+        }
+
+        /* Visualizer Inspector Panel */
+        .inspector-panel {
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .inspector-title {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .inspector-body {
+            flex: 1;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .inspector-meta-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #000000;
+        }
+
+        .inspector-meta-label {
+            color: #000000;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .inspector-meta-value {
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .packet-card {
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .packet-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .packet-card-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #000000;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .packet-card-id {
+            font-family: var(--font-mono);
+            color: #000000;
+            font-weight: 800;
+            text-decoration: underline;
+        }
+
+        .packet-card-ttl {
+            background: #000000;
+            color: #ffffff;
+            padding: 1px 6px;
+            border-radius: 0px;
+            font-weight: 700;
+        }
+
+        /* 3-Column Operations Layout */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-bottom: 24px;
         }
+
         .card {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
-            border: 1px solid #eef2f8;
-            transition: all 0.2s;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 24px;
+            box-shadow: 4px 4px 0px #000000;
+            transition: transform 0.2s;
         }
+
         .card-full {
             grid-column: span 3;
         }
-        .card-header {
+
+        .card-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-        }
-        .card-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2a48;
-        }
-        .card-header .badge {
-            background: #f0f2f8;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #42526e;
+            margin-bottom: 20px;
         }
 
-        /* Payment Form */
-        .payment-form {
-            background: #ffffff;
+        .card-header-row h3 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 800;
+            color: #000000;
+            letter-spacing: -0.2px;
+            text-transform: uppercase;
         }
-        .input-row {
+
+        .card-badge {
+            background: #ffffff;
+            border: 2px solid #000000;
+            padding: 4px 12px;
+            border-radius: 0px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        /* Form styling */
+        .form-group {
             margin-bottom: 16px;
         }
-        .input-row label {
+
+        .form-group label {
             display: block;
             font-size: 12px;
-            font-weight: 600;
-            color: #5f6c84;
+            font-weight: 800;
+            color: #000000;
             margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
+
         select, input {
             width: 100%;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px 14px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 12px 16px;
             font-size: 14px;
-            font-weight: 500;
-            color: #1a1f36;
+            font-weight: 700;
+            color: #000000;
             font-family: inherit;
-            transition: all 0.15s;
+            transition: none;
         }
+
         select:focus, input:focus {
             outline: none;
-            border-color: #0a2540;
-            box-shadow: 0 0 0 3px rgba(10,37,64,0.08);
+            box-shadow: 2px 2px 0px #000000;
         }
-        .double-row {
+
+        .double-form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
+
+        /* Mode Selector Toggle */
+        .mode-selector {
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .mode-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        .mode-option.active {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        /* Buttons styling */
         .btn {
-            border: none;
-            border-radius: 14px;
-            padding: 12px 20px;
-            font-weight: 600;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 14px 24px;
+            font-weight: 800;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
             font-family: inherit;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 2px 2px 0px #000000;
+            transition: transform 0.1s;
         }
+
+        .btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px #000000;
+        }
+
         .btn-primary {
-            background: #0a2540;
-            color: white;
+            background: #000000;
+            color: #ffffff;
         }
+
         .btn-primary:hover {
-            background: #1d3a5c;
-            transform: translateY(-1px);
+            background: #333333;
         }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 2px 2px 0px #000000 !important;
+        }
+
         .btn-secondary {
-            background: white;
-            border: 1px solid #e2e8f0;
-            color: #2c3e66;
+            background: #ffffff;
+            color: #000000;
         }
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #e2e8f0;
-            color: #5f6c84;
-        }
-        .btn-outline:hover {
-            background: #f8fafc;
-        }
+
         .btn-danger {
-            background: white;
-            border: 1px solid #fee2e2;
-            color: #dc2626;
+            background: #ffffff;
+            color: #000000;
+            border-style: dashed;
         }
-        .btn-danger:hover {
-            background: #fef2f2;
-        }
-        .action-group {
+
+        .operations-panel {
             display: flex;
+            flex-direction: column;
             gap: 12px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .action-group .btn {
-            flex: 1;
         }
 
-        /* Device list */
-        .device-list {
+        .ops-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Stats Grid */
+        .stats-list {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
         }
-        .device-item {
+
+        .stat-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f4fa;
-        }
-        .device-info {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .device-name {
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .device-meta {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .tag {
-            font-size: 11px;
-            padding: 2px 10px;
-            border-radius: 30px;
-            font-weight: 600;
-        }
-        .tag-bridge {
-            background: #eef2ff;
-            color: #1e4a76;
-        }
-        .tag-offline {
-            background: #f1f3f8;
-            color: #5f6c84;
-        }
-        .packet-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 4px;
-        }
-        .chip {
-            background: #f0f4fa;
-            padding: 2px 10px;
-            border-radius: 16px;
-            font-family: 'SF Mono', monospace;
-            font-size: 10px;
-            font-weight: 500;
-            color: #3e5a7e;
+            padding: 14px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
         }
 
-        /* Balance rows */
-        .balance-item {
+        .stat-meta {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f4fa;
+            flex-direction: column;
         }
-        .balance-user {
-            font-weight: 500;
-            font-size: 14px;
-        }
-        .balance-user small {
-            font-size: 11px;
-            color: #7c8ea0;
-            display: block;
-            font-weight: 400;
-        }
-        .balance-amount {
+
+        .stat-label {
+            font-size: 13px;
+            color: #000000;
             font-weight: 700;
-            font-size: 16px;
-            font-family: monospace;
-        }
-        .version-badge {
-            font-size: 10px;
-            background: #eef2ff;
-            padding: 2px 6px;
-            border-radius: 20px;
-            margin-left: 6px;
-            color: #1e4a76;
+            text-transform: uppercase;
         }
 
-        /* Transaction List */
-        .tx-list {
-            max-height: 320px;
+        .stat-desc {
+            font-size: 11px;
+            color: #000000;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 800;
+            color: #000000;
+        }
+
+        /* Account Balances */
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 240px;
             overflow-y: auto;
         }
-        .tx-item {
+
+        .account-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid #f0f4fa;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .tx-details {
-            flex: 2;
-        }
-        .tx-id {
-            font-family: monospace;
-            font-size: 11px;
-            color: #7c8ea0;
-            margin-bottom: 4px;
-        }
-        .tx-route {
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .tx-meta {
-            font-size: 11px;
-            color: #7c8ea0;
-            margin-top: 4px;
-        }
-        .status {
-            font-size: 12px;
-            font-weight: 700;
-            padding: 4px 14px;
-            border-radius: 40px;
-        }
-        .status-settled {
-            background: #eaf6ed;
-            color: #1e7b4a;
-        }
-        .status-rejected {
-            background: #fee8e7;
-            color: #dc2626;
-        }
-        .status-invalid {
-            background: #ffedd5;
-            color: #b45309;
-        }
-        .status-duplicate {
-            background: #f1f3f8;
-            color: #6b7280;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
         }
 
-        /* Log area */
-        .log-area {
-            background: #0e121b;
-            border-radius: 18px;
-            padding: 16px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
+        .account-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .account-vpa {
+            font-weight: 700;
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .account-holder {
+            font-size: 11px;
+            color: #000000;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .account-balance {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 15px;
+            color: #000000;
+            text-decoration: underline;
+        }
+
+        /* Ledger and Console styling */
+        .ledger-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 0px;
+            border: 2px solid #000000;
+            background: #ffffff;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .ledger-table th {
+            text-align: left;
+            padding: 12px 16px;
+            background: #000000;
+            color: #ffffff;
+            font-weight: 700;
+            border-bottom: 2px solid #000000;
+            text-transform: uppercase;
+        }
+
+        .ledger-table td {
+            padding: 14px 16px;
+            border-bottom: 2px solid #000000;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .ledger-table tr:hover td {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 0px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 2px solid #000000;
+        }
+
+        .status-chip-settled {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .status-chip-rejected {
+            background: #ffffff;
+            color: #000000;
+            border-style: dashed;
+        }
+
+        .status-chip-invalid {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .status-chip-duplicate {
+            background: #ffffff;
+            color: rgba(0, 0, 0, 0.4);
+            border-color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Console styling */
+        .console-area {
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0px;
+            padding: 16px 20px;
+            font-family: var(--font-mono);
             font-size: 12px;
             line-height: 1.6;
-            color: #a3b3d4;
-            max-height: 200px;
+            color: #000000;
+            height: 180px;
             overflow-y: auto;
-        }
-        hr {
-            margin: 12px 0;
-            border: none;
-            border-top: 1px solid #eef2f8;
-        }
-        .status-pending {
-            background: #fff3e3;
-            color: #b85c00;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-        .loading-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #5f6c84;
-            margin-left: 4px;
-            animation: pulse 1s infinite;
+            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.1);
         }
 
-        @media (max-width: 900px) {
+        .console-line {
+            margin-bottom: 6px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            padding-bottom: 4px;
+        }
+
+        .console-timestamp {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .console-prefix {
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .console-prefix-sys { color: #000000; text-decoration: underline; }
+        .console-prefix-mesh { color: #000000; font-weight: 800; }
+        .console-prefix-gate { color: #000000; border-bottom: 1px solid #000000; }
+        .console-prefix-warn { color: #000000; font-style: italic; }
+        .console-prefix-err { color: #000000; font-weight: 900; background: #000000; color: #ffffff; padding: 0 4px; }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.85);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 0px;
+            width: 100%;
+            max-width: 600px;
+            padding: 28px;
+            box-shadow: 8px 8px 0px #000000;
+            animation: modalSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 12px;
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            color: #000000;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #000000;
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .close-btn:hover {
+            text-decoration: underline;
+        }
+
+        .proof-block {
+            background: #ffffff;
+            border-radius: 0px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #000000;
+            max-height: 240px;
+            overflow-y: auto;
+            border: 2px solid #000000;
+            margin-top: 12px;
+            word-break: break-all;
+        }
+
+        .proof-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            border-bottom: 1px dashed rgba(0,0,0,0.15);
+            padding-bottom: 4px;
+        }
+
+        .proof-label {
+            color: #000000;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .proof-val {
+            color: #000000;
+            font-weight: 800;
+        }
+
+        /* Animations */
+        @keyframes modalSlide {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffffff;
+            border-left: 2px solid #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #000000;
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333333;
+        }
+
+        @media (max-width: 1024px) {
+            .visualizer-container {
+                grid-template-columns: 1fr;
+            }
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             .card-full {
                 grid-column: span 1;
             }
-            .app-container {
-                padding: 16px;
-            }
         }
     </style>
 </head>
 <body>
+
 <div class="app-container">
     <!-- Header -->
     <div class="header">
         <div class="logo-section">
-            <div class="logo-icon">⚡</div>
+            <div class="logo-icon">UP</div>
             <div class="logo-text">
-                <h1>Off UPI</h1>
-                <p>Offline Mesh · Zero Internet Settlement</p>
+                <h1>OFFUPI SIMULATION MATRIX</h1>
+                <p>Zero-Connectivity Ledger & Distributed Gossip Propagation</p>
             </div>
         </div>
-        <div class="network-badge">
-            <span class="dot"></span> Live Mesh · Backend Connected
+        <div class="system-status">
+            <div class="status-badge">
+                <span class="ping-dot"></span> P2P Mesh Connected
+            </div>
         </div>
     </div>
 
-    <!-- Dashboard Grid -->
+    <!-- Visualizer Canvas and Node Info -->
+    <div class="visualizer-container">
+        <!-- Interactive Canvas -->
+        <div class="canvas-wrapper">
+            <canvas id="meshCanvas" width="700" height="400"></canvas>
+        </div>
+
+        <!-- Node / Device Inspector -->
+        <div class="inspector-panel">
+            <div>
+                <div class="inspector-title">
+                    <span>📱 Device Inspector</span>
+                </div>
+                <div id="inspectorDeviceName" style="font-size: 16px; font-weight: 800; color: #000000; margin-bottom: 12px; text-transform: uppercase;">
+                    Select a node to inspect...
+                </div>
+                <div id="inspectorMeta" class="inspector-body">
+                    <p style="color: #000000; font-weight: 500;">Click on any device node in the mesh matrix to inspect its local buffers, internet connectivity status, and cryptographically signed packets.</p>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" id="inspectorDecryptBtn" style="display: none; margin-top: 12px;">
+                🔐 Decrypt Staged Ciphertext
+            </button>
+        </div>
+    </div>
+
+    <!-- Operations & Forms Grid -->
     <div class="dashboard-grid">
-        <!-- Payment Card -->
+        <!-- Card 1: Inject Payment -->
         <div class="card">
-            <div class="card-header">
-                <h3>New Payment</h3>
-                <div class="badge">PIN: 1234</div>
+            <div class="card-header-row">
+                <h3>📤 Outbound Injection</h3>
+                <div class="card-badge">Client Node</div>
             </div>
-            <div class="payment-form">
-                <div class="input-row">
-                    <label>From (Sender VPA)</label>
-                    <select id="senderVpa">
-                        <option>tanmay@demo</option>
-                        <option>devid@demo</option>
-                        <option>kartik@demo</option>
-                        <option>pranay@demo</option>
-                    </select>
+            
+            <!-- Mode Toggle Selection -->
+            <div class="mode-selector">
+                <div class="mode-option active" id="modeOffline">
+                    Mesh Route
                 </div>
-                <div class="input-row">
-                    <label>To (Receiver VPA)</label>
-                    <select id="receiverVpa">
-                        <option>devid@demo</option>
-                        <option>tanmay@demo</option>
-                        <option>kartik@demo</option>
-                        <option>pranay@demo</option>
-                    </select>
+                <div class="mode-option" id="modeOnline">
+                    Direct Settled
                 </div>
-                <div class="double-row">
-                    <div class="input-row">
-                        <label>Amount (₹)</label>
-                        <input type="number" id="amount" value="350" placeholder="Amount">
-                    </div>
-                    <div class="input-row">
-                        <label>Security PIN</label>
-                        <input type="text" id="pin" value="1234" maxlength="4" placeholder="PIN">
-                    </div>
+            </div>
+
+            <div class="form-group">
+                <label>Sender Account (VPA)</label>
+                <select id="senderVpa">
+                    <option value="tanmay@demo">tanmay@demo</option>
+                    <option value="devid@demo">devid@demo</option>
+                    <option value="kartik@demo" selected>kartik@demo</option>
+                    <option value="pranay@demo">pranay@demo</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Receiver Account (VPA)</label>
+                <select id="receiverVpa">
+                    <option value="devid@demo">devid@demo</option>
+                    <option value="tanmay@demo" selected>tanmay@demo</option>
+                    <option value="kartik@demo">kartik@demo</option>
+                    <option value="pranay@demo">pranay@demo</option>
+                </select>
+            </div>
+
+            <div class="double-form-row">
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input type="number" id="amount" value="250" placeholder="Amount">
                 </div>
-                <button class="btn btn-primary" id="sendPaymentBtn">
-                    📡 Inject into Mesh
+                <div class="form-group">
+                    <label>Security PIN</label>
+                    <input type="password" id="pin" value="1234" maxlength="4" style="text-align: center; letter-spacing: 4px;">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="injectBtn">
+                ⚡ Inject into Matrix
+            </button>
+        </div>
+
+        <!-- Card 2: Gossip & Bridge Operations -->
+        <div class="card">
+            <div class="card-header-row">
+                <h3>🔄 Mesh Operations</h3>
+                <div class="card-badge">Gossip Protocol</div>
+            </div>
+
+            <div class="operations-panel">
+                <div style="font-size: 13px; color: #000000; margin-bottom: 8px; font-weight: 500;">
+                    Simulate Peer-to-Peer gossip propagation and Cellular Uplink recovery for bridge devices.
+                </div>
+
+                <button class="btn btn-secondary" id="gossipBtn" style="padding: 16px 20px;">
+                    🔄 Execute Gossip Step
                 </button>
-            </div>
-        </div>
 
-        <!-- Operations Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Network Operations</h3>
-                <div class="badge">TTL = 5</div>
-            </div>
-            <div class="action-group">
-                <button class="btn btn-secondary" id="gossipBtn">🔄 Gossip</button>
-                <button class="btn btn-secondary" id="flushBtn">🌉 Bridge Flush</button>
-                <button class="btn btn-outline" id="resetBtn">🗑️ Reset</button>
-            </div>
-            <hr>
-            <div style="margin-top: 12px;">
-                <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px;">Protocol Info</div>
-                <div style="font-size: 12px; color: #5f6c84;">📦 Packets hop device → device (TTL decay)</div>
-                <div style="font-size: 12px; color: #5f6c84;">🌉 Bridge nodes (4G) settle via idempotent backend</div>
-                <div style="font-size: 12px; color: #5f6c84;">🔐 Duplicate detection & PIN validation (1234)</div>
-            </div>
-        </div>
+                <button class="btn btn-secondary" id="flushBtn" style="padding: 16px 20px;">
+                    🌉 Flush Bridge Uplinks
+                </button>
 
-        <!-- Stats Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Mesh Stats</h3>
-            </div>
-            <div style="margin-top: 6px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
-                    <span style="font-size:13px">Idempotency Cache</span>
-                    <span id="cacheSize" style="font-weight:700; font-family:monospace">0</span>
+                <div class="ops-row">
+                    <button class="btn btn-danger" id="resetBtn">
+                        🗑️ Reset Mesh
+                    </button>
+                    <button class="btn btn-secondary" id="reloadBtn">
+                        ↻ Refresh Data
+                    </button>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
-                    <span style="font-size:13px">Settled Transactions</span>
-                    <span id="totalSettled" style="font-weight:700; font-family:monospace">0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="font-size:13px">In-flight Packets</span>
-                    <span id="activePackets" style="font-weight:700; font-family:monospace">0</span>
+                
+                <hr style="border: none; border-top: 2px dashed #000000; margin: 8px 0;">
+                
+                <div style="font-size: 12px; color: #000000; display: flex; flex-direction: column; gap: 4px; font-weight: 500;">
+                    <div>• <b>Gossip Step</b>: Relays messages to adjacent devices (TTL-1).</div>
+                    <div>• <b>Bridge Flush</b>: Bridge uploads buffered mesh packets to DB.</div>
+                    <div>• <b>Security PIN</b>: Authentication validator token (1234).</div>
                 </div>
             </div>
         </div>
 
-        <!-- Mesh Devices -->
+        <!-- Card 3: Metrics & System State -->
         <div class="card">
-            <div class="card-header">
-                <h3>📱 Mesh Nodes</h3>
-                <div class="badge">5 devices</div>
+            <div class="card-header-row">
+                <h3>📊 Telemetry Stats</h3>
+                <div class="card-badge">Real-time</div>
             </div>
-            <div id="devicesList" class="device-list">
-                <div class="device-item"><div class="device-info">Loading devices...</div></div>
+
+            <div class="stats-list">
+                <div class="stat-item">
+                    <div class="stat-meta">
+                        <span class="stat-label">In-Flight Packets</span>
+                        <span class="stat-desc">Circulating in mesh</span>
+                    </div>
+                    <span class="stat-value" id="statInFlight">0</span>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="stat-meta">
+                        <span class="stat-label">Settled Ledger Size</span>
+                        <span class="stat-desc">Committed transactions</span>
+                    </div>
+                    <span class="stat-value" id="statSettledCount">0</span>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-meta">
+                        <span class="stat-label">Redis Cache Locks</span>
+                        <span class="stat-desc">Deduplication keys</span>
+                    </div>
+                    <span class="stat-value" id="statCacheLocks">0</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="font-size: 12px; color: #000000; text-transform: uppercase; margin-bottom: 8px; font-weight: 800;">Active Accounts</h4>
+                <div class="accounts-list" id="accountsList">
+                    <div style="padding: 12px; text-align: center; color: #000000; font-weight: 600;">Loading accounts...</div>
+                </div>
             </div>
         </div>
 
-        <!-- Account Balances -->
-        <div class="card">
-            <div class="card-header">
-                <h3>💰 Account Balances</h3>
-            </div>
-            <div id="accountsContainer">
-                <div class="balance-item">Fetching accounts...</div>
-            </div>
-        </div>
-
-        <!-- Transaction Ledger Full Width -->
+        <!-- Settlement Ledger -->
         <div class="card card-full">
-            <div class="card-header">
-                <h3>📜 Settlement Ledger</h3>
-                <div class="badge">Real-time</div>
+            <div class="card-header-row">
+                <h3>📜 Central Settlement Ledger</h3>
+                <div class="card-badge">PostgreSQL State Engine</div>
             </div>
-            <div id="ledgerContainer" class="tx-list">
-                <div style="padding: 28px; text-align:center; color:#9aaebf;">Loading transactions...</div>
+            
+            <div class="ledger-container">
+                <table class="ledger-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Transfer Flow</th>
+                            <th>Settlement Volume</th>
+                            <th>Sim Hops</th>
+                            <th>Bridge Point</th>
+                            <th>Execution State</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledgerBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 32px; color: #000000; font-weight: 600;">
+                                Fetching transactional records...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Activity Log -->
+        <!-- Terminal Logs -->
         <div class="card card-full">
-            <div class="card-header">
-                <h3>📋 Activity Log</h3>
+            <div class="card-header-row">
+                <h3>📋 System Event Streams</h3>
+                <div class="card-badge">Actuator telemetry</div>
             </div>
-            <div id="logContainer" class="log-area">
-                [system] connecting to backend APIs...
+            <div class="console-area" id="consoleLogs">
+                <div class="console-line">
+                    <span class="console-timestamp">[11:00:00]</span>
+                    <span class="console-prefix console-prefix-sys">[SYS]</span>
+                    <span class="console-text">System initializing mesh matrices...</span>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Cryptographic Proof Inspector -->
+<div class="modal" id="proofModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🔐 Payment Packet Proof</h3>
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+        </div>
+        <div id="modalBody">
+            <!-- Dynamic modal content goes here -->
         </div>
     </div>
 </div>
 
 <script>
-    // ============================================================
-    // BACKEND CONNECTION LAYER (Spring Boot REST APIs)
-    // Base URL – change if backend runs on different port
-    // ============================================================
-    const API_BASE = 'http://localhost:8081';  // empty = relative to same origin (proxy or spring serve)
-    // Alternatively set absolute: 'http://localhost:8080'
-
-    // Helper for fetch with error handling
+    // ============================================================================
+    // API CONNECTION LAYER
+    // ============================================================================
+    const API_BASE = window.location.port === '5500' || window.location.port === '8081' ? 'http://localhost:8080' : '';
+    
     async function apiCall(endpoint, method = 'GET', body = null) {
         const options = {
             method,
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: { 'Content-Type': 'application/json' }
         };
-        if (body) options.body = JSON.stringify(body);
-        try {
-            const response = await fetch(`${API_BASE}${endpoint}`, options);
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`API error ${response.status}: ${errText.substring(0, 100)}`);
-            }
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return await response.json();
-            }
-            return await response.text();
-        } catch (err) {
-            console.error(`API call failed: ${endpoint}`, err);
-            throw err;
+        if (body) {
+            options.body = typeof body === 'string' ? body : JSON.stringify(body);
+        }
+        
+        const response = await fetch(`${API_BASE}${endpoint}`, options);
+        if (!response.ok) {
+            const err = await response.text();
+            throw new Error(`[API Error ${response.status}] ${err}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        }
+        return await response.text();
+    }
+
+    // Logger
+    function logEvent(service, message, type = 'sys') {
+        const consoleEl = document.getElementById('consoleLogs');
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+        
+        const line = document.createElement('div');
+        line.className = 'console-line';
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'console-timestamp';
+        timeSpan.innerText = `[${timestamp}]`;
+        
+        const prefixSpan = document.createElement('span');
+        prefixSpan.className = `console-prefix console-prefix-${type}`;
+        prefixSpan.innerText = `[${service.toUpperCase()}]`;
+        
+        const textSpan = document.createElement('span');
+        textSpan.className = 'console-text';
+        textSpan.innerHTML = message;
+        
+        line.appendChild(timeSpan);
+        line.appendChild(prefixSpan);
+        line.appendChild(textSpan);
+        
+        consoleEl.appendChild(line);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+        
+        // Truncate logs
+        while (consoleEl.children.length > 100) {
+            consoleEl.removeChild(consoleEl.firstChild);
         }
     }
 
-    // Add to log UI
-    function addLog(message, isError = false) {
-        const logEl = document.getElementById('logContainer');
-        const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-        const prefix = isError ? '⚠️' : '📌';
-        logEl.innerHTML = `[${time}] ${prefix} ${message}<br>${logEl.innerHTML}`;
-        if (logEl.innerHTML.length > 3800) logEl.innerHTML = logEl.innerHTML.substring(0, 3400);
+    // ============================================================================
+    // SIMULATED MESH VISUALIZER (CANVAS)
+    // ============================================================================
+    const canvas = document.getElementById('meshCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Node Locations
+    const nodes = {
+        'phone-alice': { name: 'Alice Node (Sender)', x: 100, y: 200, type: 'offline', packets: [], desc: 'Offline user generating transactions.', color: '#000000' },
+        'phone-stranger1': { name: 'Stranger Node 1', x: 220, y: 100, type: 'offline', packets: [], desc: 'Intermediate P2P router hop.', color: '#000000' },
+        'phone-stranger2': { name: 'Stranger Node 2', x: 340, y: 140, type: 'offline', packets: [], desc: 'Intermediate P2P router hop.', color: '#000000' },
+        'phone-stranger3': { name: 'Stranger Node 3', x: 240, y: 300, type: 'offline', packets: [], desc: 'Intermediate P2P router hop.', color: '#000000' },
+        'phone-bridge': { name: 'Bridge Node', x: 420, y: 280, type: 'bridge', packets: [], desc: 'Relay device containing 4G internet link.', color: '#000000' }
+    };
+    
+    const serverNode = { name: 'Central Gateway (DB)', x: 600, y: 200, type: 'server', desc: 'Secure database ledger host.', color: '#000000' };
+    
+    // Mesh links mapping
+    const links = [
+        ['phone-alice', 'phone-stranger1'],
+        ['phone-alice', 'phone-stranger3'],
+        ['phone-stranger1', 'phone-stranger2'],
+        ['phone-stranger3', 'phone-stranger2'],
+        ['phone-stranger2', 'phone-bridge'],
+        ['phone-stranger3', 'phone-bridge'],
+        ['phone-stranger1', 'phone-bridge']
+    ];
+    
+    let activeNodeId = null;
+    let particles = []; // Packet transfer animations
+
+    function triggerParticleAnimation(fromId, toId, color = '#000000') {
+        const from = fromId === 'server' ? serverNode : nodes[fromId];
+        const to = toId === 'server' ? serverNode : nodes[toId];
+        if (!from || !to) return;
+        
+        particles.push({
+            x: from.x,
+            y: from.y,
+            from: from,
+            to: to,
+            progress: 0,
+            speed: 0.025,
+            color: '#000000'
+        });
     }
 
-    // ==================== DATA FETCHING FROM BACKEND ====================
-    // 1. Accounts from /api/accounts
-    async function fetchAccounts() {
-        try {
-            const accountsData = await apiCall('/api/accounts');
-            if (!Array.isArray(accountsData)) throw new Error('Invalid accounts response');
-            const container = document.getElementById('accountsContainer');
-            if (accountsData.length === 0) {
-                container.innerHTML = '<div class="balance-item">No accounts found</div>';
-                return;
+    function drawVisualizer() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Canvas background - clear white
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 1. Draw P2P links (thin black lines)
+        ctx.lineWidth = 1.5;
+        links.forEach(([fromId, toId]) => {
+            const from = nodes[fromId];
+            const to = nodes[toId];
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(to.x, to.y);
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.stroke();
+            
+            // Link flows (small black dots)
+            const t = (Date.now() / 2000) % 1;
+            const px = from.x + (to.x - from.x) * t;
+            const py = from.y + (to.y - from.y) * t;
+            ctx.beginPath();
+            ctx.arc(px, py, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#000000';
+            ctx.fill();
+        });
+        
+        // 2. Draw Bridge-to-Server uplink path (dashed black line)
+        const bridge = nodes['phone-bridge'];
+        ctx.beginPath();
+        ctx.moveTo(bridge.x, bridge.y);
+        ctx.lineTo(serverNode.x, serverNode.y);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000000';
+        ctx.setLineDash([6, 6]);
+        ctx.lineDashOffset = -Math.floor(Date.now() / 50) % 12;
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset
+        
+        // 3. Draw Particles (black packets)
+        particles.forEach((p, idx) => {
+            p.progress += p.speed;
+            p.x = p.from.x + (p.to.x - p.from.x) * p.progress;
+            p.y = p.from.y + (p.to.y - p.from.y) * p.progress;
+            
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#000000';
+            ctx.fill();
+            
+            if (p.progress >= 1) {
+                particles.splice(idx, 1);
             }
-            container.innerHTML = accountsData.map(acc => `
-                <div class="balance-item">
-                    <div class="balance-user">
-                        ${acc.vpa || acc.id || 'unknown'}
-                        <small>${acc.holderName || 'holder'}</small>
-                        <span class="version-badge">v${acc.version ?? 0}</span>
+        });
+        
+        // 4. Draw Central Server Node
+        ctx.beginPath();
+        ctx.arc(serverNode.x, serverNode.y, 32, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.fillStyle = '#000000';
+        ctx.font = '800 12px ' + getComputedStyle(document.body).getPropertyValue('--font-display');
+        ctx.textAlign = 'center';
+        ctx.fillText('DB CLOUD', serverNode.x, serverNode.y + 4);
+        
+        // 5. Draw mobile device nodes
+        Object.entries(nodes).forEach(([id, node]) => {
+            const isSelected = activeNodeId === id;
+            
+            // Draw outer border for selected node
+            if (isSelected) {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 28, 0, Math.PI * 2);
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 22, 0, Math.PI * 2);
+            ctx.fillStyle = isSelected ? '#000000' : '#ffffff';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+            
+            // Draw packet count badge (white circle with black border)
+            if (node.packets && node.packets.length > 0) {
+                ctx.beginPath();
+                ctx.arc(node.x + 16, node.y - 16, 9, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = '800 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.packets.length, node.x + 16, node.y - 12);
+            }
+            
+            // Draw inner node symbol (reverse color when selected)
+            ctx.fillStyle = isSelected ? '#ffffff' : '#000000';
+            ctx.font = '700 13px ' + getComputedStyle(document.body).getPropertyValue('--font-display');
+            ctx.textAlign = 'center';
+            ctx.fillText(node.type === 'bridge' ? 'BG' : 'PH', node.x, node.y + 4);
+            
+            // Name label below node
+            ctx.fillStyle = '#000000';
+            ctx.font = '700 11px ' + getComputedStyle(document.body).getPropertyValue('--font-sans');
+            ctx.fillText(node.name.toUpperCase(), node.x, node.y + 36);
+        });
+        
+        requestAnimationFrame(drawVisualizer);
+    }
+    
+    // Click Listener on Canvas to select Node
+    canvas.addEventListener('click', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = ((event.clientX - rect.left) / rect.width) * canvas.width;
+        const mouseY = ((event.clientY - rect.top) / rect.height) * canvas.height;
+        
+        let clickedNodeId = null;
+        
+        Object.entries(nodes).forEach(([id, node]) => {
+            const dist = Math.hypot(node.x - mouseX, node.y - mouseY);
+            if (dist < 26) {
+                clickedNodeId = id;
+            }
+        });
+        
+        const serverDist = Math.hypot(serverNode.x - mouseX, serverNode.y - mouseY);
+        if (serverDist < 36) {
+            clickedNodeId = 'server';
+        }
+        
+        selectNode(clickedNodeId);
+    });
+    
+    function selectNode(nodeId) {
+        activeNodeId = nodeId;
+        const nameEl = document.getElementById('inspectorDeviceName');
+        const metaEl = document.getElementById('inspectorMeta');
+        const decryptBtn = document.getElementById('inspectorDecryptBtn');
+        
+        decryptBtn.style.display = 'none';
+        
+        if (!nodeId) {
+            nameEl.innerText = 'Select a node to inspect...';
+            metaEl.innerHTML = `<p style="color: #000000; font-weight: 500;">Click on any device node in the mesh matrix to inspect its local buffers, internet connectivity status, and cryptographically signed packets.</p>`;
+            return;
+        }
+        
+        if (nodeId === 'server') {
+            nameEl.innerText = serverNode.name;
+            metaEl.innerHTML = `
+                <div class="inspector-meta-row">
+                    <span class="inspector-meta-label">Interface Role</span>
+                    <span class="inspector-meta-value">Ledger Engine</span>
+                </div>
+                <div class="inspector-meta-row">
+                    <span class="inspector-meta-label">Uplink Connectivity</span>
+                    <span class="inspector-meta-value">Online / WAN</span>
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: #000000; font-weight: 500;">
+                    ${serverNode.desc.toUpperCase()}<br><br>
+                    AUTHENTICATES HYBRID-ENCRYPTED ENVELOPES USING THE RSA-4096 PRIVATE KEY.
+                </div>
+            `;
+            return;
+        }
+        
+        const node = nodes[nodeId];
+        nameEl.innerText = node.name;
+        
+        let packetsHtml = '<p style="color: #000000; margin-top: 10px; font-weight: 500;">No staged packets in buffer memory.</p>';
+        if (node.packets && node.packets.length > 0) {
+            packetsHtml = node.packets.map(pkt => `
+                <div class="packet-card" onclick="inspectPacketDetails('${nodeId}', '${pkt.packetId}')">
+                    <div class="packet-card-header">
+                        <span class="packet-card-id">ID: ${pkt.packetId.substring(0, 8).toUpperCase()}...</span>
+                        <span class="packet-card-ttl">TTL: ${pkt.ttl}</span>
                     </div>
-                    <div class="balance-amount">₹ ${(acc.balance || 0).toFixed(2)}</div>
+                    <div style="font-size: 11px; color: #000000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono);">
+                        CIPHERTEXT: ${pkt.ciphertext.substring(0, 36)}...
+                    </div>
                 </div>
             `).join('');
-            addLog(`Accounts refreshed: ${accountsData.length} accounts loaded`);
+        }
+        
+        metaEl.innerHTML = `
+            <div class="inspector-meta-row">
+                <span class="inspector-meta-label">Node Identifier</span>
+                <span class="inspector-meta-value">${nodeId.toUpperCase()}</span>
+            </div>
+            <div class="inspector-meta-row">
+                <span class="inspector-meta-label">Type Category</span>
+                <span class="inspector-meta-value" style="text-transform: uppercase;">${node.type.toUpperCase()}</span>
+            </div>
+            <div class="inspector-meta-row">
+                <span class="inspector-meta-label">Mesh Network Gateway</span>
+                <span class="inspector-meta-value">
+                    ${node.type === 'bridge' ? 'UPLINK ACTIVE' : 'ZERO-CONNECTIVITY'}
+                </span>
+            </div>
+            <div style="margin-top: 12px;">
+                <h4 style="font-size: 12px; color: #000000; text-transform: uppercase; font-weight: 800;">Buffered Packets (${node.packets.length})</h4>
+                ${packetsHtml}
+            </div>
+        `;
+    }
+
+    // Inspect packet details and trigger decryption
+    let selectedInspectPacket = null;
+    function inspectPacketDetails(nodeId, packetId) {
+        const node = nodes[nodeId];
+        const pkt = node.packets.find(p => p.packetId === packetId);
+        if (!pkt) return;
+        
+        selectedInspectPacket = pkt;
+        
+        const modal = document.getElementById('proofModal');
+        const modalBody = document.getElementById('modalBody');
+        modal.style.display = 'flex';
+        
+        modalBody.innerHTML = `
+            <div class="proof-row">
+                <span class="proof-label">Packet Hash ID</span>
+                <span class="proof-val" style="font-family: var(--font-mono);">${pkt.packetId.toUpperCase()}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Remaining TTL Hops</span>
+                <span class="proof-val">${pkt.ttl}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Staged At</span>
+                <span class="proof-val">${new Date(pkt.createdAt).toLocaleTimeString()}</span>
+            </div>
+            <div style="margin-top: 12px;">
+                <span class="proof-label">Asymmetric Hybrid Envelope (AES-256-GCM + RSA-4096)</span>
+                <div class="proof-block" style="word-break: break-all;">
+                    ${pkt.ciphertext}
+                </div>
+            </div>
+            
+            <div id="decryptedOutputContainer" style="margin-top: 16px; display: none;">
+                <span class="proof-label" style="font-weight: 800; text-decoration: underline;">🔓 Decrypted Plaintext Instruction (Decrypted via Private Key)</span>
+                <div class="proof-block" id="decryptedOutput">
+                    Decrypting...
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <button class="btn btn-primary" id="modalDecryptBtn">
+                    🔐 Decrypt with server private key
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        `;
+        
+        document.getElementById('modalDecryptBtn').addEventListener('click', async () => {
+            const decryptOutContainer = document.getElementById('decryptedOutputContainer');
+            const decryptOut = document.getElementById('decryptedOutput');
+            const btn = document.getElementById('modalDecryptBtn');
+            
+            decryptOutContainer.style.display = 'block';
+            btn.disabled = true;
+            
+            try {
+                logEvent('sys', `Requesting server decryption for packet ${pkt.packetId.substring(0, 12)}...`, 'sys');
+                const decryptedData = await apiCall('/api/demo/decrypt', 'POST', pkt.ciphertext);
+                decryptOut.innerHTML = `
+<div class="proof-row"><span class="proof-label">Sender Address</span> <span class="proof-val">${decryptedData.senderVpa}</span></div>
+<div class="proof-row"><span class="proof-label">Receiver Address</span> <span class="proof-val">${decryptedData.receiverVpa}</span></div>
+<div class="proof-row"><span class="proof-label">Settlement Amount</span> <span class="proof-val" style="font-weight: 800;">₹${decryptedData.amount.toFixed(2)}</span></div>
+<div class="proof-row"><span class="proof-label">Cryptographic Nonce</span> <span class="proof-val" style="font-size: 10px;">${decryptedData.nonce}</span></div>
+<div class="proof-row"><span class="proof-label">Signed Timestamp</span> <span class="proof-val">${new Date(decryptedData.signedAt).toLocaleString()}</span></div>
+<div class="proof-row"><span class="proof-label">PIN Security Token</span> <span class="proof-val" style="font-family: var(--font-mono);">${decryptedData.pinHash.substring(0, 16)}...</span></div>
+                `;
+                logEvent('gate', `Private-key decryption successful for packet ${pkt.packetId.substring(0, 8)}. Integrity Verified.`, 'gate');
+            } catch (err) {
+                decryptOut.innerText = `Decryption Failed: ${err.message}`;
+                logEvent('warn', `Decryption failed for packet ${pkt.packetId.substring(0, 8)}: ${err.message}`, 'warn');
+            }
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('proofModal').style.display = 'none';
+    }
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+
+    // ============================================================================
+    // APPLICATION CONTROLLER (FETCH & REFRESH)
+    // ============================================================================
+    let immediateSettlement = false;
+    
+    // Toggle Button Bindings
+    document.getElementById('modeOffline').addEventListener('click', () => {
+        immediateSettlement = false;
+        document.getElementById('modeOffline').classList.add('active');
+        document.getElementById('modeOnline').classList.remove('active');
+        logEvent('sys', 'Outbound transaction mode switched to <b>Offline Mesh Routing</b>.', 'sys');
+    });
+    
+    document.getElementById('modeOnline').addEventListener('click', () => {
+        immediateSettlement = true;
+        document.getElementById('modeOnline').classList.add('active');
+        document.getElementById('modeOffline').classList.remove('active');
+        logEvent('sys', 'Outbound transaction mode switched to <b>Direct settled</b>.', 'sys');
+    });
+
+    // Load Account balances
+    async function loadAccounts() {
+        try {
+            const data = await apiCall('/api/accounts');
+            const listEl = document.getElementById('accountsList');
+            if (data.length === 0) {
+                listEl.innerHTML = '<div style="padding: 12px; text-align: center; color: #000000; font-weight: 700;">No accounts found.</div>';
+                return;
+            }
+            
+            listEl.innerHTML = data.map(acc => `
+                <div class="account-item">
+                    <div class="account-info">
+                        <span class="account-vpa">${acc.vpa}</span>
+                        <span class="account-holder">${acc.holderName.toUpperCase()} <span style="font-size: 9px; font-weight: 800; padding-left: 4px;">V${acc.version}</span></span>
+                    </div>
+                    <span class="account-balance">₹${acc.balance.toFixed(2)}</span>
+                </div>
+            `).join('');
         } catch (err) {
-            addLog(`Failed to load accounts: ${err.message}`, true);
-            document.getElementById('accountsContainer').innerHTML = '<div class="balance-item">⚠️ backend unreachable</div>';
+            logEvent('err', `Failed to load accounts: ${err.message}`, 'err');
         }
     }
 
-    // 2. Transactions from /api/transactions
-    async function fetchTransactions() {
+    // Load Transactions Ledger
+    async function loadTransactions() {
         try {
             const txs = await apiCall('/api/transactions');
-            const ledgerDiv = document.getElementById('ledgerContainer');
-            if (!txs || txs.length === 0) {
-                ledgerDiv.innerHTML = '<div style="padding: 28px; text-align:center; color:#9aaebf;">No transactions settled yet</div>';
+            const tbody = document.getElementById('ledgerBody');
+            
+            if (txs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 32px; color: #000000; font-weight: 700;">
+                            No settled transactions committed to PostgreSQL ledger yet.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('statSettledCount').innerText = '0';
+                document.getElementById('statCacheLocks').innerText = '0';
                 return;
             }
-            ledgerDiv.innerHTML = txs.slice(0, 25).map(tx => {
-                let statusClass = '';
-                let statusLabel = tx.status || 'PENDING';
-                if (statusLabel === 'SETTLED') { statusClass = 'status-settled'; statusLabel = '✅ SETTLED'; }
-                else if (statusLabel === 'REJECTED') { statusClass = 'status-rejected'; statusLabel = '❌ REJECTED'; }
-                else if (statusLabel === 'INVALID') { statusClass = 'status-invalid'; statusLabel = '🔑 INVALID PIN'; }
-                else if (statusLabel === 'DUPLICATE') { statusClass = 'status-duplicate'; statusLabel = '🔄 DUPLICATE'; }
-                else { statusClass = 'status-pending'; }
-                const versionInfo = tx.senderVersion ? ` · Sender v${tx.senderVersion}` : '';
-                const amountVal = tx.amount ? tx.amount.toFixed(2) : '0';
+            
+            document.getElementById('statSettledCount').innerText = txs.filter(t => t.status === 'SETTLED').length;
+            document.getElementById('statCacheLocks').innerText = txs.length;
+            
+            tbody.innerHTML = txs.map(tx => {
+                let badgeClass = 'status-chip-settled';
+                if (tx.status === 'REJECTED') badgeClass = 'status-chip-rejected';
+                else if (tx.status === 'INVALID') badgeClass = 'status-chip-invalid';
+                else if (tx.status === 'DUPLICATE') badgeClass = 'status-chip-duplicate';
+                
                 return `
-<div class="tx-item">
-
-    <div class="tx-details">
-
-        <div class="tx-id">
-            ${String(tx.id || 'tx_').slice(0,14)}...
-        </div>
-
-        <div class="tx-route">
-            ${tx.senderVpa} → ${tx.receiverVpa}
-        </div>
-
-        <div class="tx-meta">
-            ₹${tx.amount}
-            • Hops: ${tx.hopCount ?? 0}
-            • Bridge: ${tx.bridgeNodeId || '-'}
-        </div>
-
-    </div>
-
-    <div class="status ${statusClass}">
-        ${statusLabel}
-    </div>
-
-</div>
-`;
+                    <tr>
+                        <td style="font-family: var(--font-mono); font-weight: 800;">
+                            ${tx.id.toString().substring(0, 12).toUpperCase()}
+                        </td>
+                        <td style="font-weight: 700;">
+                            ${tx.senderVpa} <span style="padding: 0 4px;">➔</span> ${tx.receiverVpa}
+                        </td>
+                        <td style="font-weight: 800; font-family: var(--font-mono);">
+                            ₹${tx.amount.toFixed(2)}
+                        </td>
+                        <td style="font-family: var(--font-mono); text-align: center;">
+                            ${tx.hopCount}
+                        </td>
+                        <td style="font-weight: 700;">
+                            ${tx.bridgeNodeId ? tx.bridgeNodeId.toUpperCase() : '-'}
+                        </td>
+                        <td>
+                            <span class="status-chip ${badgeClass}">${tx.status}</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; width: auto;" onclick="inspectLedgerProof('${tx.packetHash}', '${tx.senderVpa}', '${tx.receiverVpa}', ${tx.amount}, ${tx.hopCount}, '${tx.bridgeNodeId}', '${tx.status}')">
+                                Prove 🔍
+                            </button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
-            const settledCount = (txs || []).filter(t => t.status === 'SETTLED').length;
-            document.getElementById('totalSettled').innerText = settledCount;
-            document.getElementById('cacheSize').innerText = txs.length; // approximate idempotency size from ledger
         } catch (err) {
-            addLog(`Failed to fetch transactions: ${err.message}`, true);
+            logEvent('err', `Failed to load transaction list: ${err.message}`, 'err');
         }
     }
 
-    // 3. Mesh state from /api/mesh/state
-    async function fetchMeshState() {
+    // Inspect ledger transaction details (proof of settlement)
+    function inspectLedgerProof(hash, sender, receiver, amount, hops, bridgeId, status) {
+        const modal = document.getElementById('proofModal');
+        const modalBody = document.getElementById('modalBody');
+        modal.style.display = 'flex';
+        
+        modalBody.innerHTML = `
+            <div class="proof-row">
+                <span class="proof-label">Ledger Status</span>
+                <span class="proof-val status-chip ${status === 'SETTLED' ? 'status-chip-settled' : 'status-chip-rejected'}">${status}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Sender Address</span>
+                <span class="proof-val">${sender}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Receiver Address</span>
+                <span class="proof-val">${receiver}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Settled Volume</span>
+                <span class="proof-val" style="font-weight: 800;">₹${amount.toFixed(2)}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Simulation Gossip Hops</span>
+                <span class="proof-val">${hops}</span>
+            </div>
+            <div class="proof-row">
+                <span class="proof-label">Relay Ingestion Bridge</span>
+                <span class="proof-val">${bridgeId ? bridgeId.toUpperCase() : 'DIRECT GATEWAY'}</span>
+            </div>
+            <div style="margin-top: 12px;">
+                <span class="proof-label">Immutable SHA-256 Fingerprint (Redis / DB Lock)</span>
+                <div class="proof-block" style="word-break: break-all; font-family: var(--font-mono);">
+                    ${hash.toUpperCase()}
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal()">Close Details</button>
+            </div>
+        `;
+    }
+
+    // Get current mesh network buffers
+    async function loadMeshState() {
         try {
             const devices = await apiCall('/api/mesh/state');
-            const devicesDiv = document.getElementById('devicesList');
-            if (!devices || !Array.isArray(devices)) {
-                devicesDiv.innerHTML = '<div class="device-item"><div class="device-info">Mesh unavailable</div></div>';
-                return;
-            }
+            if (!devices || !Array.isArray(devices)) return;
+            
             let totalPackets = 0;
-            devicesDiv.innerHTML = devices.map(dev => {
-                const packets = dev.packets || [];
-                totalPackets += packets.length;
-                const packetChips = packets.slice(0, 3).map(p =>
-                    `<span class="chip">${String(p.packetId || p).slice(-8)}</span>`
-                );
-                const more = packets.length > 3 ? `<span class="chip">+${packets.length-3}</span>` : '';
-                return `
-                <div class="device-item">
-                    <div class="device-info">
-                        <div class="device-name">
-    ${dev.nodeId || dev.deviceId || 'unknown-device'}
-                         <span class="tag ${dev.internet ? 'tag-bridge' : 'tag-offline'}">
-    ${dev.internet ? 'BRIDGE' : 'OFFLINE'}
-</span></div>
-                        <div class="device-meta">
-                            <span style="font-size:11px; color:#7c8ea0;">${packets.length} packet(s)</span>
-                        </div>
-                        <div class="packet-chips">${packetChips.join('')} ${more}</div>
-                    </div>
-                </div>`;
-            }).join('');
-            document.getElementById('activePackets').innerText = totalPackets;
+            
+            devices.forEach(dev => {
+                const id = dev.nodeId || dev.deviceId;
+                if (nodes[id]) {
+                    nodes[id].packets = dev.packets || [];
+                    totalPackets += nodes[id].packets.length;
+                }
+            });
+            
+            document.getElementById('statInFlight').innerText = totalPackets;
+            
+            if (activeNodeId && activeNodeId !== 'server') {
+                selectNode(activeNodeId);
+            }
         } catch (err) {
-            addLog(`Mesh state error: ${err.message}`, true);
+            logEvent('err', `Failed to load mesh network state: ${err.message}`, 'err');
         }
     }
 
-    // ==================== ACTIONS (POST to backend) ====================
-    // Send payment via /api/demo/send
-    async function sendPaymentToBackend(sender, receiver, amount, pin) {
-        const payload = {
-            senderVpa: sender,
-            receiverVpa: receiver,
-            amount: amount,
-            pin: pin
-        };
-        addLog(`💸 Sending payment: ${sender} → ${receiver} ₹${amount}`);
-        try {
-            const response = await apiCall('/api/demo/send', 'POST', payload);
-            addLog(`✅ Payment injected: ${response.substring(0, 80)}`);
-            // After sending, refresh mesh state & transactions
-            await Promise.all([fetchMeshState(), fetchTransactions(), fetchAccounts()]);
-            return true;
-        } catch (err) {
-            addLog(`❌ Payment failed: ${err.message}`, true);
-            return false;
-        }
-    }
-
-    // Gossip: POST /api/mesh/gossip
-    async function triggerGossip() {
-        addLog(`🔄 Triggering gossip round...`);
-        try {
-            const result = await apiCall('/api/mesh/gossip', 'POST');
-            addLog(`📡 Gossip executed: ${JSON.stringify(result).substring(0, 100)}`);
-            await fetchMeshState();
-        } catch (err) {
-            addLog(`Gossip error: ${err.message}`, true);
-        }
-    }
-
-    // Flush bridges: POST /api/mesh/flush
-    async function triggerFlush() {
-        addLog(`🌉 Bridge flush initiated (settling offline packets)...`);
-        try {
-            const result = await apiCall('/api/mesh/flush', 'POST');
-            addLog(`✅ Bridge flush completed: ${result}`);
-            await Promise.all([fetchMeshState(), fetchTransactions(), fetchAccounts()]);
-        } catch (err) {
-            addLog(`Flush error: ${err.message}`, true);
-        }
-    }
-
-    // Reset mesh: POST /api/mesh/reset
-    async function triggerReset() {
-        addLog(`⚠️ Requesting mesh reset...`);
-        try {
-            const result = await apiCall('/api/mesh/reset', 'POST');
-            addLog(`♻️ Mesh reset successful: ${result}`);
-            await Promise.all([fetchMeshState(), fetchTransactions(), fetchAccounts()]);
-        } catch (err) {
-            addLog(`Reset error: ${err.message}`, true);
-        }
-    }
-
-    // ==================== UI EVENT BINDINGS ====================
-    document.getElementById('sendPaymentBtn').addEventListener('click', async () => {
+    // Inject payment API call
+    document.getElementById('injectBtn').addEventListener('click', async () => {
         const sender = document.getElementById('senderVpa').value;
         const receiver = document.getElementById('receiverVpa').value;
         const amount = parseFloat(document.getElementById('amount').value);
         const pin = document.getElementById('pin').value;
-
+        
         if (sender === receiver) {
-            addLog("❌ Cannot send payment to yourself", true);
+            logEvent('warn', 'Payment injection aborted: Sender and Receiver addresses must be unique.', 'warn');
             return;
         }
         if (isNaN(amount) || amount <= 0) {
-            addLog("❌ Invalid amount", true);
+            logEvent('warn', 'Payment injection aborted: Transfer value must be greater than zero.', 'warn');
             return;
         }
-        if (pin !== "1234") {
-            addLog("⚠️ Demo PIN must be 1234 for valid settlement (backend validation)", true);
+        if (!pin || pin.length !== 4) {
+            logEvent('warn', 'Payment injection aborted: Security PIN must be 4 characters.', 'warn');
+            return;
         }
-        // Disable button briefly
-        const btn = document.getElementById('sendPaymentBtn');
+        
+        const btn = document.getElementById('injectBtn');
         btn.disabled = true;
-        btn.innerHTML = "⏳ Injecting...";
-        await sendPaymentToBackend(sender, receiver, amount, pin);
-        btn.disabled = false;
-        btn.innerHTML = "📡 Inject into Mesh";
+        btn.innerText = 'Creating Secure Envelope...';
+        
+        try {
+            logEvent('sys', `Injecting ₹${amount} envelope at <b>phone-alice</b>...`, 'sys');
+            const resultText = await apiCall(`/api/demo/send?immediate=${immediateSettlement}`, 'POST', {
+                senderVpa: sender,
+                receiverVpa: receiver,
+                amount: amount,
+                pin: pin
+            });
+            
+            triggerParticleAnimation('phone-alice', 'phone-stranger1');
+            logEvent('mesh', `Packet generated on client device. ${resultText.toUpperCase()}`, 'mesh');
+            
+            if (immediateSettlement) {
+                setTimeout(() => {
+                    triggerParticleAnimation('phone-bridge', 'server');
+                }, 400);
+            }
+            
+            document.getElementById('amount').value = '250';
+            
+            await refreshAllData();
+        } catch (err) {
+            logEvent('err', `Payment Injection Failed: ${err.message}`, 'err');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '⚡ Inject into Matrix';
+        }
     });
 
+    // Execute Gossip Round
     document.getElementById('gossipBtn').addEventListener('click', async () => {
         const btn = document.getElementById('gossipBtn');
         btn.disabled = true;
-        await triggerGossip();
-        btn.disabled = false;
-    });
-
-    document.getElementById('flushBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('flushBtn');
-        btn.disabled = true;
-        await triggerFlush();
-        btn.disabled = false;
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', async () => {
-        if (confirm('Reset entire mesh? Balances will revert, cache cleared.')) {
-            await triggerReset();
+        btn.innerText = '🔄 Gossip Exchanging...';
+        
+        try {
+            logEvent('mesh', 'Broadcasting local packet cache buffers via BLE/Wi-Fi Direct RF channels...', 'mesh');
+            const res = await apiCall('/api/mesh/gossip', 'POST');
+            
+            links.forEach(([from, to]) => {
+                if (nodes[from].packets.length > 0 || nodes[to].packets.length > 0) {
+                    triggerParticleAnimation(from, to);
+                }
+            });
+            
+            logEvent('gossip', `Gossip step completed. Exchanged <b>${res.transfers}</b> packets.`, 'gossip');
+            await refreshAllData();
+        } catch (err) {
+            logEvent('err', `Gossip failed: ${err.message}`, 'err');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '🔄 Execute Gossip Step';
         }
     });
 
-    // Periodic auto refresh (every 3 seconds)
-    let refreshInterval;
-    async function fullRefresh() {
+    // Flush Bridges
+    document.getElementById('flushBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('flushBtn');
+        btn.disabled = true;
+        btn.innerText = '🌉 Uploading packets...';
+        
         try {
-            await Promise.allSettled([
-                fetchAccounts(),
-                fetchTransactions(),
-                fetchMeshState()
-            ]);
-        } catch (e) { /* ignore */ }
+            const bridgePktsCount = nodes['phone-bridge'].packets.length;
+            logEvent('mesh', `Initiating bridge connection. Uploading <b>${bridgePktsCount}</b> staged envelopes to server gateway...`, 'mesh');
+            
+            if (bridgePktsCount > 0) {
+                triggerParticleAnimation('phone-bridge', 'server');
+            }
+            
+            const resText = await apiCall('/api/mesh/flush', 'POST');
+            logEvent('gate', `Gateway flush complete: ${resText.toUpperCase()}`, 'gate');
+            await refreshAllData();
+        } catch (err) {
+            logEvent('err', `Bridge flush failed: ${err.message}`, 'err');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '🌉 Flush Bridge Uplinks';
+        }
+    });
+
+    // Reset Mesh
+    document.getElementById('resetBtn').addEventListener('click', async () => {
+        if (!confirm('Revert all balances, evict cache locks, and purge simulation buffers?')) return;
+        
+        try {
+            logEvent('sys', 'Clearing mesh packets and resetting ledger balances to seed configuration...', 'warn');
+            const res = await apiCall('/api/mesh/reset', 'POST');
+            logEvent('sys', `Database seed config restored: ${res.toUpperCase()}`, 'sys');
+            
+            particles = [];
+            activeNodeId = null;
+            selectNode(null);
+            
+            await refreshAllData();
+        } catch (err) {
+            logEvent('err', `Mesh reset failed: ${err.message}`, 'err');
+        }
+    });
+
+    // Manual Refresh
+    document.getElementById('reloadBtn').addEventListener('click', async () => {
+        logEvent('sys', 'Manual data synchronization triggered.', 'sys');
+        await refreshAllData();
+    });
+
+    // Combined refresh helper
+    async function refreshAllData() {
+        await Promise.allSettled([
+            loadAccounts(),
+            loadTransactions(),
+            loadMeshState()
+        ]);
     }
 
-    // Initial load & setup
+    // Auto polling intervals
+    setInterval(async () => {
+        try {
+            await Promise.all([
+                loadMeshState(),
+                loadTransactions(),
+                loadAccounts()
+            ]);
+        } catch (e) {}
+    }, 3000);
+
+    // Bootstrap
     async function bootstrap() {
-        addLog("🚀 Off UPI frontend connected to Spring Boot backend");
-        await fullRefresh();
-        refreshInterval = setInterval(fullRefresh, 3000);
-        // test connectivity heartbeat
-        setTimeout(() => {
-            addLog("✅ Real-time sync active (3s polling)");
-        }, 1000);
+        logEvent('sys', 'Connecting to Spring Boot Actuator Gateways...', 'sys');
+        await refreshAllData();
+        logEvent('sys', 'Real-time telemetry sync active. (3s polling)', 'gate');
+        drawVisualizer();
     }
 
     bootstrap();
 </script>
+
 </body>
 </html>
