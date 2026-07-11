@@ -653,4 +653,4 @@ This project demonstrates advanced concepts:
 
 ---
 
-**Made with for the fintech and distributed systems community.**
+**Made with for the fintech and distributed systems community.**.
