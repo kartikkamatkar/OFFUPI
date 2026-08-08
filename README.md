@@ -18,7 +18,7 @@ In disconnected topographies (e.g., remote geographic zones, underground transit
 Once any single node in the mesh gains uplink access (4G/5G/Wi-Fi), it flushes the buffered payloads to the central backend. The architecture guarantees:
 - ✅ End-to-end security
 - ✅ Atomic double-spend prevention
-- ✅ Strict distributed idempotency at enterprise scale
+- ✅ Strict distributed idempotency at enterprise scale.
 
 ---
 
