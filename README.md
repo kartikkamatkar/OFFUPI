@@ -11,7 +11,7 @@
 
 ## 📋 Overview
 
-**OFFUPI** systematically addresses the **"zero-connectivity ledger validation paradox"** within retail payment rails like the Unified Payments Interface (UPI).
+**OFFUPI** systematically addresses the **"zero-connectivity ledger validation paradox"** within retail payment rails like the Unified Payments Interface (UPI)..
 
 In disconnected topographies (e.g., remote geographic zones, underground transit, infrastructure collapses), transacting nodes lack access to centralized banking ledgers. OFFUPI introduces a **trustless, decentralized gossip-routing framework**. Transactions are cryptographically signed, enveloped using hybrid public-key structures, and propagated peer-to-peer via local transport protocols (BLE, Wi-Fi Direct).
 
